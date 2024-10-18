@@ -32,3 +32,47 @@ TextStyle body = GoogleFonts.barlow(
   color: blackColor,
   fontWeight: FontWeight.normal,
 );
+
+TextStyle error = GoogleFonts.barlow(
+  fontSize: 14,
+  color: branchColor,
+  fontWeight: FontWeight.normal,
+);
+
+// TextFormField
+
+dynamic EnableBorder() {
+  return const OutlineInputBorder(
+    borderRadius: BorderRadius.all(
+      Radius.circular(16.0),
+    ),
+    borderSide: BorderSide(color: greyColor, width: 1),
+  );
+}
+
+dynamic FocusBorder() {
+  return const OutlineInputBorder(
+    borderRadius: BorderRadius.all(
+      Radius.circular(16.0),
+    ),
+    borderSide: BorderSide(color: blackColor, width: 2),
+  );
+}
+
+dynamic ErrorBorder() {
+  return const OutlineInputBorder(
+    borderRadius: BorderRadius.all(
+      Radius.circular(16.0),
+    ),
+    borderSide: BorderSide(color: branchColor, width: 1),
+  );
+}
+
+dynamic ErrorFocusBorder() {
+  return const OutlineInputBorder(
+    borderRadius: BorderRadius.all(
+      Radius.circular(16.0),
+    ),
+    borderSide: BorderSide(color: branchColor, width: 2),
+  );
+}
