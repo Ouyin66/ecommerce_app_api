@@ -173,18 +173,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                       elevation: 8,
                     ),
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => const MainWidget(),
-                      //   ),
-                      // );
                       setState(() {
                         if (_formKey.currentState!.validate()) {
-                          // Nếu form hợp lệ, thực hiện hành động
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Form hợp lệ')),
-                          );
+                          // ScaffoldMessenger.of(context).showSnackBar(
+                          //   SnackBar(content: Text('Form hợp lệ')),
+                          // );
                           login();
                         } else if (errorEmail != null ||
                             errorPassword != null) {

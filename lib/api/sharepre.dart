@@ -7,16 +7,17 @@ Future<bool> saveUser(User objUser) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String strUser = jsonEncode(objUser);
     prefs.setString('user', strUser);
-    print("Luu thanh cong: $strUser");
+    print("Lưu thành công: $strUser");
     return true;
   } catch (e) {
+    print("Lưu thất bại");
     print(e);
     return false;
   }
 }
 
-Future<User> getUser() async {
-  SharedPreferences pref = await SharedPreferences.getInstance();
-  String strUser = pref.getString('user')!;
-  return User.fromJson(jsonDecode(strUser));
-}
+// Future<User> getUser() async {
+//   SharedPreferences pref = await SharedPreferences.getInstance();
+//   String strUser = pref.getString('user')!;
+//   return User.fromJson(jsonDecode(strUser));
+// }

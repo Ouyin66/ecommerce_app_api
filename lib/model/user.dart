@@ -11,31 +11,65 @@ class User {
   String? providerID;
   String? dateCreate;
 
-  User(
-      {this.id,
-      this.email,
-      this.password,
-      this.name,
-      this.location,
-      this.image,
-      this.gender,
-      this.state,
-      this.role,
-      this.providerID,
-      this.dateCreate});
+  User({
+    this.id,
+    this.email,
+    this.password,
+    this.name,
+    this.location,
+    this.image,
+    this.gender,
+    this.state,
+    this.role,
+    this.providerID,
+    this.dateCreate,
+  });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["id"],
-        email: json["email"],
-        password: json["password"],
-        name: json["name"],
-        image:
-            json["image"] == null || json["image"] == '' ? "" : json['image'],
-        location: json["location"],
-        gender: json["gender"],
-        state: json["state"],
-        role: json["role"],
-        providerID: json["providerID"],
-        dateCreate: json["dateCreate"],
-      );
+  static User userEmpty() {
+    return User(
+      id: null,
+      email: '',
+      password: '',
+      name: '',
+      location: '',
+      image: '',
+      gender: null,
+      state: null,
+      role: null,
+      providerID: '',
+      dateCreate: '',
+    );
+  }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json["id"] ?? 0,
+      email: json["email"] ?? '',
+      password: json["password"] ?? '',
+      name: json["name"] ?? '',
+      image: json["image"] == null || json["image"] == '' ? "" : json["image"],
+      location: json["location"] ?? '',
+      gender: json["gender"] ?? 0,
+      state: json["state"] ?? 0,
+      role: json["role"] ?? 0,
+      providerID: json["providerID"] ?? '',
+      dateCreate: json["dateCreate"] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "email": email,
+      "password": password, // Consider not storing the password in plain text
+      "name": name,
+      "location": location,
+      "image": image,
+      "gender": gender,
+      "state": state,
+      "role": role,
+      "providerID": providerID,
+      "dateCreate": dateCreate,
+    };
+  }
 }

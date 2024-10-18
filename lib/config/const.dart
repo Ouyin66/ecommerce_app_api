@@ -40,7 +40,6 @@ TextStyle error = GoogleFonts.barlow(
 );
 
 // TextFormField
-
 dynamic EnableBorder() {
   return const OutlineInputBorder(
     borderRadius: BorderRadius.all(

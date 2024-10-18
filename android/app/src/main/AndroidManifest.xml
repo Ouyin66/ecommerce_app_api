@@ -2,7 +2,8 @@
     <application
         android:label="ecommerce_app_api"
         android:name="${applicationName}"
-        android:icon="@mipmap/uniqlo">
+        android:icon="@mipmap/uniqlo"
+        android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

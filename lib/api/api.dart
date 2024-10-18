@@ -10,7 +10,6 @@ class APIRepository {
   final List<String> baseurls = [
     'http://10.0.2.2:5132',
     'http://192.168.1.126:5132',
-    'http://<other_ip_address>:5132', // Nếu bạn có IP khác cần thử
   ];
 
   Future<LoginResponse?> login(String email, String password) async {
