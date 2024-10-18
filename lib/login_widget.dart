@@ -20,17 +20,35 @@ class _LoginWidgetState extends State<LoginWidget> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String? errorPassword;
+  String? errorEmail;
 
   bool _isHidden = true;
 
   void login() async {
     try {
-      var user = await APIRepository()
+      // Gọi API để thực hiện đăng nhập
+      var response = await APIRepository()
           .login(_emailController.text, _passwordController.text);
-      saveUser(user);
-      print(user.name);
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => const MainPage()));
+
+      // Kiểm tra phản hồi từ API
+      setState(() {
+        errorEmail = null;
+        errorPassword = null;
+
+        if (response?.user != null) {
+          saveUser(response!.user!);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const MainPage()));
+        } else if (response?.errorMessageEmail != null) {
+          errorEmail = response?.errorMessageEmail;
+        } else if (response?.errorMessagePassword != null) {
+          errorPassword = response?.errorMessagePassword;
+        } else if (response?.message != null) {
+          showErrorDialog(response!.message!);
+        }
+        _formKey.currentState!.validate();
+      });
     } catch (ex) {
       print("Error: $ex");
       showErrorDialog("Đăng nhập thất bại");
@@ -86,7 +104,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                               .hasMatch(value)) {
                             return 'Email không hợp lệ';
                           }
-                          return null; // Nếu không có lỗi
+                          return errorEmail;
                         },
                       ),
                       const SizedBox(height: 15),
@@ -98,10 +116,13 @@ class _LoginWidgetState extends State<LoginWidget> {
                         (value) {
                           if (value == null || value.isEmpty) {
                             return 'Vui lòng nhập mật khẩu';
-                          } else if (value.length < 6) {
-                            return 'Mật khẩu phải có ít nhất 6 ký tự';
+                          } else if (!RegExp(
+                                  r'^(?=.*[a-zA-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$')
+                              .hasMatch(value)) {
+                            return 'Phải từ 6 ký tự, 1 chữ cái, 1 ký tự đặc biệt';
                           }
-                          return null; // Trả về null nếu hợp lệ
+
+                          return errorPassword;
                         },
                         isPassword: true,
                         isHidden: _isHidden,
@@ -158,13 +179,18 @@ class _LoginWidgetState extends State<LoginWidget> {
                       //     builder: (context) => const MainWidget(),
                       //   ),
                       // );
-                      if (_formKey.currentState!.validate()) {
-                        // Nếu form hợp lệ, thực hiện hành động
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Form hợp lệ')),
-                        );
-                        login();
-                      }
+                      setState(() {
+                        if (_formKey.currentState!.validate()) {
+                          // Nếu form hợp lệ, thực hiện hành động
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Form hợp lệ')),
+                          );
+                          login();
+                        } else if (errorEmail != null ||
+                            errorPassword != null) {
+                          login();
+                        }
+                      });
                     },
                     child: Padding(
                       padding: EdgeInsets.all(12),

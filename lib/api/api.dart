@@ -1,68 +1,42 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'dart:convert';
+import '../model/loginresponse.dart';
 import '../model/user.dart';
-
-class API {
-  final Dio _dio = Dio();
-  String baseUrl = "http://192.168.1.126:5132";
-
-  API() {
-    _dio.options.baseUrl = baseUrl;
-    _dio.options.connectTimeout = Duration(seconds: 10); // Thay đổi ở đây
-    _dio.options.receiveTimeout = Duration(seconds: 10); // Thay đổi ở đây
-  }
-
-  Dio get sendRequest => _dio;
-}
+import 'package:http/http.dart' as http; // Thư viện để gọi HTTP
 
 class APIRepository {
-  API api = API();
+  final List<String> baseurls = [
+    'http://10.0.2.2:5132',
+    'http://192.168.1.126:5132',
+    'http://<other_ip_address>:5132', // Nếu bạn có IP khác cần thử
+  ];
 
-  Map<String, dynamic> header(String token) {
-    return {
-      "Access-Control-Allow-Origin": "*",
-      'Content-Type': 'application/json',
-      'Accept': '*/*',
-      'Authorization': 'Bearer $token'
-    };
-  }
-
-  Future<User> login(String email, String password) async {
-    try {
-      final response =
-          await api.sendRequest.get('/User/Login', queryParameters: {
+  Future<LoginResponse?> login(String email, String password) async {
+    for (var baseurl in baseurls) {
+      Uri uri = Uri.parse("$baseurl/User/Login").replace(queryParameters: {
         'email': email,
         'password': password,
       });
-      // final body = FormData.fromMap({'email': email, 'password': password});
 
-      // final response = await api.sendRequest.get('/User/Login',
-      //     options: Options(headers: header('no token')), data: body);
+      try {
+        final response = await http.get(uri);
 
-      if (response.statusCode == 200) {
-        return User.fromJson(response.data);
-      } else if (response.statusCode == 404) {
-        throw Exception("User not found: ${response.data['message']}");
-      } else if (response.statusCode == 401) {
-        throw Exception("Unauthorized: ${response.data['message']}");
-      } else {
-        throw Exception("Unexpected error: ${response.statusCode}");
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = jsonDecode(response.body);
+          return LoginResponse(user: User.fromJson(data['user']));
+        } else if (response.statusCode == 404) {
+          return LoginResponse(errorMessageEmail: "Người dùng không tồn tại");
+        } else if (response.statusCode == 401) {
+          return LoginResponse(errorMessagePassword: "Mật khẩu không đúng");
+        } else {
+          return LoginResponse(message: "Đã xảy ra lỗi không xác định");
+        }
+      } catch (e) {
+        print("Lỗi: $e với baseurl: $baseurl");
       }
-    } catch (e) {
-      print("Login exception: $e");
-      throw Exception("Login failed: $e");
     }
+    return LoginResponse(message: "Không thể kết nối đến máy chủ.");
   }
-
-  // Future<User> current(String token) async {
-  //   try {
-  //     Response res = await api.sendRequest
-  //         .get('/Auth/current', options: Options(headers: header(token)));
-  //     return User.fromJson(res.data);
-  //   } catch (ex) {
-  //     rethrow;
-  //   }
-  // }
 }

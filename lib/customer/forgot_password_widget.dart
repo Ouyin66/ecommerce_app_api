@@ -25,14 +25,14 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
               children: [
                 Logo(),
                 SizedBox(
-                  height: 50,
+                  height: 40,
                 ),
                 Image.asset(
                   urlForgetPassword,
                   fit: BoxFit.contain,
                 ),
                 SizedBox(
-                  height: 50,
+                  height: 40,
                 ),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -54,7 +54,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                         "Nhập địa chỉ email được liên kết với tài khoản của bạn",
                         style: body),
                     const SizedBox(
-                      height: 35,
+                      height: 25,
                     ),
                     Form(
                       key: _formKey,
@@ -63,7 +63,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                         style: const TextStyle(fontSize: 16),
                         obscureText: false,
                         decoration: InputDecoration(
-                          labelText: "Nhập địa chỉ vào đây...",
+                          labelText: "Nhập địa chỉ email vào đây...",
                           labelStyle: const TextStyle(
                             color: greyColor,
                             fontSize: 16,
@@ -95,6 +95,8 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                       height: 20,
                     ),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           flex: 4,

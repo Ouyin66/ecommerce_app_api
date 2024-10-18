@@ -83,10 +83,13 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                         (value) {
                           if (value == null || value.isEmpty) {
                             return 'Vui lòng nhập mật khẩu';
-                          } else if (value.length < 6) {
-                            return 'Mật khẩu phải có ít nhất 6 ký tự';
+                          } else if (!RegExp(
+                                  r'^(?=.*[a-zA-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$')
+                              .hasMatch(value)) {
+                            return 'Phải từ 6 ký tự, 1 chữ cái, 1 ký tự đặc biệt';
                           }
-                          return null; // Trả về null nếu hợp lệ
+
+                          return null; // Trả về thông báo lỗi nếu có
                         },
                         isPassword: true,
                         isHidden: _isHidden,
@@ -101,7 +104,9 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                         Icons.password,
                         (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập mật khẩu';
+                            return 'Vui lòng nhập lại mật khẩu';
+                          } else if (value != _passwordController.text) {
+                            return 'Mật khẩu nhập lại không trùng khớp';
                           }
                           return null; // Trả về null nếu hợp lệ
                         },
