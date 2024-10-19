@@ -12,7 +12,7 @@ class APIRepository {
     'http://192.168.1.126:5132',
   ];
 
-  Future<LoginResponse?> login(String email, String password) async {
+  Future<MessageResponse?> login(String email, String password) async {
     for (var baseurl in baseurls) {
       Uri uri = Uri.parse("$baseurl/User/Login").replace(queryParameters: {
         'email': email,
@@ -24,18 +24,70 @@ class APIRepository {
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> data = jsonDecode(response.body);
-          return LoginResponse(user: User.fromJson(data['user']));
+          return MessageResponse(user: User.fromJson(data['user']));
         } else if (response.statusCode == 404) {
-          return LoginResponse(errorMessageEmail: "Người dùng không tồn tại");
+          return MessageResponse(errorMessageEmail: "Người dùng không tồn tại");
         } else if (response.statusCode == 401) {
-          return LoginResponse(errorMessagePassword: "Mật khẩu không đúng");
+          return MessageResponse(errorMessagePassword: "Mật khẩu không đúng");
         } else {
-          return LoginResponse(message: "Đã xảy ra lỗi không xác định");
+          return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
         }
       } catch (e) {
         print("Lỗi: $e với baseurl: $baseurl");
       }
     }
-    return LoginResponse(message: "Không thể kết nối đến máy chủ.");
+    return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
+  }
+
+  Future<MessageResponse?> register(
+      String name, String email, String password) async {
+    for (var baseurl in baseurls) {
+      Uri uri = Uri.parse("$baseurl/User/Register").replace(queryParameters: {
+        'email': email,
+        'password': password,
+        'name': name,
+      });
+
+      try {
+        final response = await http.post(uri);
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = jsonDecode(response.body);
+          return MessageResponse(user: User.fromJson(data['user']));
+        } else if (response.statusCode == 400) {
+          return MessageResponse(errorMessageEmail: "Email đã được sử dụng");
+        } else {
+          return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
+        }
+      } catch (e) {
+        print("Lỗi: $e với baseurl: $baseurl");
+      }
+    }
+    return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
+  }
+
+  Future<MessageResponse?> forgotPassword(String email) async {
+    for (var baseurl in baseurls) {
+      Uri uri =
+          Uri.parse("$baseurl/User/ForgotPassword").replace(queryParameters: {
+        'email': email,
+      });
+
+      try {
+        final response = await http.post(uri);
+
+        if (response.statusCode == 200) {
+          return MessageResponse(
+              successMessage: "Mật khẩu đã được gửi qua email của bạn");
+        } else if (response.statusCode == 404) {
+          return MessageResponse(errorMessageEmail: 'Email không tồn tại');
+        } else {
+          return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
+        }
+      } catch (e) {
+        print("Lỗi: $e với baseurl: $baseurl");
+      }
+    }
+    return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
   }
 }

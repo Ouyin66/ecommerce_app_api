@@ -1,14 +1,16 @@
 import 'user.dart';
 
-class LoginResponse {
+class MessageResponse {
   final User? user;
-  final String? message;
+  final String? errorMessage;
+  final String? successMessage;
   final String? errorMessagePassword;
   final String? errorMessageEmail;
 
-  LoginResponse(
+  MessageResponse(
       {this.user,
-      this.message,
+      this.successMessage,
+      this.errorMessage,
       this.errorMessagePassword,
       this.errorMessageEmail});
 }

@@ -33,6 +33,12 @@ TextStyle body = GoogleFonts.barlow(
   fontWeight: FontWeight.normal,
 );
 
+TextStyle text = GoogleFonts.barlow(
+  fontSize: 18,
+  color: blackColor,
+  fontWeight: FontWeight.normal,
+);
+
 TextStyle error = GoogleFonts.barlow(
   fontSize: 14,
   color: branchColor,
@@ -74,4 +80,61 @@ dynamic ErrorFocusBorder() {
     ),
     borderSide: BorderSide(color: branchColor, width: 2),
   );
+}
+
+// Show Dialog
+void showErrorDialog(BuildContext context, String message, bool isError) {
+  Future.delayed(const Duration(seconds: 0), () {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        Future.delayed(Duration(seconds: isError ? 30 : 3), () {
+          Navigator.of(context).pop();
+        });
+        return AlertDialog(
+          backgroundColor: Colors.white.withOpacity(0.8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(24)),
+            side: BorderSide(
+              color: isError ? branchColor : Colors.green,
+              width: 3,
+            ),
+          ),
+          title: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                isError
+                    ? Icons.cancel_outlined
+                    : Icons.check_circle_outline_rounded,
+                color: isError ? branchColor : Colors.green,
+                size: 100,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                isError ? "Lỗi" : "Thành công",
+                style: head,
+              ),
+            ],
+          ),
+          content: Text(
+            message,
+            style: text,
+          ),
+          // actions: [
+          //   TextButton(
+          //     onPressed: () {
+          //       Navigator.of(context).pop();
+          //     },
+          //     child: Text(
+          //       "OK",
+          //       style: subhead,
+          //     ),
+          //   ),
+          // ],
+        );
+      },
+    );
+  });
 }

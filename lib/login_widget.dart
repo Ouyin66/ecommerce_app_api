@@ -38,38 +38,22 @@ class _LoginWidgetState extends State<LoginWidget> {
 
         if (response?.user != null) {
           saveUser(response!.user!);
+          showErrorDialog(context, "Đăng nhập thành công", false);
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const MainPage()));
         } else if (response?.errorMessageEmail != null) {
           errorEmail = response?.errorMessageEmail;
         } else if (response?.errorMessagePassword != null) {
           errorPassword = response?.errorMessagePassword;
-        } else if (response?.message != null) {
-          showErrorDialog(response!.message!);
+        } else if (response?.errorMessage != null) {
+          showErrorDialog(context, response!.errorMessage!, true);
         }
         _formKey.currentState!.validate();
       });
     } catch (ex) {
       print("Error: $ex");
-      showErrorDialog("Đăng nhập thất bại");
+      showErrorDialog(context, "Đăng nhập thất bại", true);
     }
-  }
-
-  void showErrorDialog(String error) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text(
-              "Lỗi đăng nhập",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: Text(error),
-          );
-        });
   }
 
   @override
@@ -165,7 +149,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: blackColor,
-                      foregroundColor: Colors.white,
+                      foregroundColor: whiteColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -418,7 +402,7 @@ class _LoginWidgetState extends State<LoginWidget> {
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
-                      _isHidden ? Icons.visibility : Icons.visibility_off,
+                      _isHidden ? Icons.visibility_off : Icons.visibility,
                       color: greyColor,
                     ),
                     onPressed: () {

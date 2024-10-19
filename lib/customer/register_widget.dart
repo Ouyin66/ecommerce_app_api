@@ -1,7 +1,9 @@
+import 'package:ecommerce_app_api/login_widget.dart';
 import 'package:ecommerce_app_api/webview.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../api/api.dart';
 import '../config/const.dart';
 
 class RegisterWidget extends StatefulWidget {
@@ -13,16 +15,43 @@ class RegisterWidget extends StatefulWidget {
 
 class _RegisterWidgetState extends State<RegisterWidget> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _personController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repasswordController = TextEditingController();
-  bool agree = false;
+  bool _acceptTerms = false;
   bool _isHidden = true;
+  String? errorEmail;
   String urlPrivacyPolicy =
       "https://faq-vn.uniqlo.com/pkb_Home_UQ_VN?id=kA32t000000TNUR&l=vi&fs=RelatedArticle";
   String urlTermsOfUse =
       "https://faq-vn.uniqlo.com/articles/vi/FAQ/%C4%90i%E1%BB%81u-kho%E1%BA%A3n-s%E1%BB%AD-d%E1%BB%A5ng";
+
+  void register() async {
+    try {
+      var response = await APIRepository().register(_nameController.text,
+          _emailController.text, _passwordController.text);
+
+      // Kiểm tra phản hồi từ API
+      setState(() {
+        errorEmail = null;
+
+        if (response?.user != null) {
+          showErrorDialog(context, "Đăng ký thành công", false);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const LoginWidget()));
+        } else if (response?.errorMessageEmail != null) {
+          errorEmail = response?.errorMessageEmail;
+        } else if (response?.errorMessage != null) {
+          showErrorDialog(context, response!.errorMessage!, true);
+        }
+        _formKey.currentState!.validate();
+      });
+    } catch (ex) {
+      print("Error: $ex");
+      showErrorDialog(context, "Đăng ký thất bại", true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +75,15 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                     children: [
                       InputField(
                         "Tên người dùng",
-                        _personController,
+                        _nameController,
                         'Nhập tên người dùng...',
                         Icons.person,
                         (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Vui lòng nhập mật khẩu';
+                            return 'Vui lòng nhập tên người dùng';
+                          }
+                          if (value.length < 3) {
+                            return 'Tên người dùng phải từ 3 ký tự trở lên';
                           }
                           return null; // Trả về null nếu hợp lệ
                         },
@@ -71,7 +103,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                               .hasMatch(value)) {
                             return 'Email không hợp lệ';
                           }
-                          return null; // Nếu không có lỗi
+                          return errorEmail;
                         },
                       ),
                       const SizedBox(height: 15),
@@ -89,7 +121,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                             return 'Phải từ 6 ký tự, 1 chữ cái, 1 ký tự đặc biệt';
                           }
 
-                          return null; // Trả về thông báo lỗi nếu có
+                          return null;
                         },
                         isPassword: true,
                         isHidden: _isHidden,
@@ -108,7 +140,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                           } else if (value != _passwordController.text) {
                             return 'Mật khẩu nhập lại không trùng khớp';
                           }
-                          return null; // Trả về null nếu hợp lệ
+                          return null;
                         },
                         isPassword: true,
                         isHidden: _isHidden,
@@ -148,46 +180,72 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                       const SizedBox(
                         height: 15,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Checkbox(
-                            value: agree,
-                            onChanged: (value) {
-                              setState(() {
-                                agree = value!;
-                              });
-                            },
-                            activeColor: branchColor,
-                            checkColor: whiteColor,
-                          ),
-                          Expanded(
-                            child: Text.rich(
-                              TextSpan(
-                                text: 'Tôi đồng ý với ',
-                                style: body,
-                                children: <TextSpan>[
-                                  TextSpan(
-                                    text: 'ĐIỀU KHOẢN SỬ DỤNG ',
-                                    style: subhead,
-                                    recognizer: _tapRecognizer(
-                                        WebView(url: urlTermsOfUse)),
+                      FormField(
+                          initialValue: _acceptTerms,
+                          validator: (value) {
+                            if (value != true) {
+                              return '*Bạn phải đồng ý với các điều khoản trên';
+                            }
+                            return null;
+                          },
+                          builder: (FormFieldState<bool> state) {
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Checkbox(
+                                      value: state.value,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _acceptTerms = value ?? false;
+                                          state.didChange(value);
+                                        });
+                                      },
+                                      isError: state.hasError ? true : false,
+                                      activeColor: branchColor,
+                                      checkColor: whiteColor,
+                                    ),
+                                    Expanded(
+                                      child: Text.rich(
+                                        TextSpan(
+                                          text: 'Tôi đồng ý với ',
+                                          style: body,
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'ĐIỀU KHOẢN SỬ DỤNG ',
+                                              style: subhead,
+                                              recognizer: _tapRecognizer(
+                                                  WebView(url: urlTermsOfUse)),
+                                            ),
+                                            TextSpan(text: 'và ', style: body),
+                                            TextSpan(
+                                              text: 'CHÍNH SÁCH RIÊNG TƯ ',
+                                              style: subhead,
+                                              recognizer: _tapRecognizer(
+                                                  WebView(
+                                                      url: urlPrivacyPolicy)),
+                                            ),
+                                            TextSpan(
+                                                text: 'của UNIQLO',
+                                                style: body),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                if (state.hasError)
+                                  Text(
+                                    state.errorText!,
+                                    style: error,
                                   ),
-                                  TextSpan(text: 'và ', style: body),
-                                  TextSpan(
-                                    text: 'CHÍNH SÁCH RIÊNG TƯ ',
-                                    style: subhead,
-                                    recognizer: _tapRecognizer(
-                                        WebView(url: urlPrivacyPolicy)),
-                                  ),
-                                  TextSpan(text: 'của UNIQLO', style: body),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                              ],
+                            );
+                          }),
                     ],
                   ),
                 ),
@@ -231,9 +289,12 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             // Nếu form hợp lệ, thực hiện hành động
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Form hợp lệ')),
-                            );
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(content: Text('Form hợp lệ')),
+                            // );
+                            register();
+                          } else if (errorEmail != null) {
+                            register();
                           }
                         },
                         child: Padding(
@@ -328,7 +389,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
-                      _isHidden ? Icons.visibility : Icons.visibility_off,
+                      _isHidden ? Icons.visibility_off : Icons.visibility,
                       color: greyColor,
                     ),
                     onPressed: () {

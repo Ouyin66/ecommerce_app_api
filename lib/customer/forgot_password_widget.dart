@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../api/api.dart';
 import '../config/const.dart';
+import '../login_widget.dart';
 
 class ForgotPasswordWidget extends StatefulWidget {
   const ForgotPasswordWidget({super.key});
@@ -12,6 +14,32 @@ class ForgotPasswordWidget extends StatefulWidget {
 class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
+  String? errorMessage;
+
+  void forgotPassword() async {
+    try {
+      var response =
+          await APIRepository().forgotPassword(_emailController.text);
+
+      setState(() {
+        errorMessage = null;
+
+        if (response?.successMessage != null) {
+          showErrorDialog(context, response!.successMessage!, false);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const LoginWidget()));
+        } else if (response?.errorMessageEmail != null) {
+          errorMessage = response?.errorMessageEmail;
+        } else if (response?.errorMessage != null) {
+          showErrorDialog(context, response!.errorMessage!, true);
+        }
+        _formKey.currentState!.validate();
+      });
+    } catch (ex) {
+      print("Error: $ex");
+      showErrorDialog(context, "Khôi phục thất bại", true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +114,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                               .hasMatch(value)) {
                             return 'Email không hợp lệ';
                           }
-                          return null; // Nếu không có lỗi
+                          return errorMessage; // Nếu không có lỗi
                         },
                         onChanged: null,
                       ),
@@ -133,9 +161,12 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 // Nếu form hợp lệ, thực hiện hành động
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Form hợp lệ')),
-                                );
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //   SnackBar(content: Text('Form hợp lệ')),
+                                // );
+                                forgotPassword();
+                              } else if (errorMessage != null) {
+                                forgotPassword();
                               }
                             },
                             child: Padding(
