@@ -12,6 +12,7 @@ class APIRepository {
     'http://192.168.1.126:5132',
   ];
 
+  // Login method
   Future<MessageResponse?> login(String email, String password) async {
     for (var baseurl in baseurls) {
       Uri uri = Uri.parse("$baseurl/User/Login").replace(queryParameters: {
@@ -39,6 +40,7 @@ class APIRepository {
     return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
   }
 
+  // Register method
   Future<MessageResponse?> register(
       String name, String email, String password) async {
     for (var baseurl in baseurls) {
@@ -66,6 +68,7 @@ class APIRepository {
     return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
   }
 
+  // Forgot Password method
   Future<MessageResponse?> forgotPassword(String email) async {
     for (var baseurl in baseurls) {
       Uri uri =
@@ -81,6 +84,34 @@ class APIRepository {
               successMessage: "Mật khẩu đã được gửi qua email của bạn");
         } else if (response.statusCode == 404) {
           return MessageResponse(errorMessageEmail: 'Email không tồn tại');
+        } else {
+          return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
+        }
+      } catch (e) {
+        print("Lỗi: $e với baseurl: $baseurl");
+      }
+    }
+    return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
+  }
+
+  // Signin with Google method
+  Future<MessageResponse?> SignInGoogle(String? email, String? providerID,
+      String? photoUrl, String? displayName) async {
+    for (var baseurl in baseurls) {
+      Uri uri =
+          Uri.parse("$baseurl/User/GoogleSignIn").replace(queryParameters: {
+        'email': email,
+        'providerID': providerID,
+        'displayName': displayName,
+        'photoUrl': photoUrl,
+      });
+
+      try {
+        final response = await http.post(uri);
+
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = jsonDecode(response.body);
+          return MessageResponse(user: User.fromJson(data['existingUser']));
         } else {
           return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
         }
