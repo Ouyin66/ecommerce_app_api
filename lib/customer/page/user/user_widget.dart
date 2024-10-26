@@ -1,21 +1,28 @@
-import 'package:ecommerce_app_api/api/sharepre.dart';
-import 'package:ecommerce_app_api/config/const.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../model/user.dart';
+import '../../../config/const.dart';
+import '../../../login_widget.dart';
+import '../../../model/user.dart';
 import 'dart:convert';
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+class UserWidget extends StatefulWidget {
+  const UserWidget({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<UserWidget> createState() => _UserWidgetState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _UserWidgetState extends State<UserWidget> {
   User user = User.userEmpty();
 
-  getDataUser() async {
+  void logout() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginWidget()),
+    );
+  }
+
+  void getDataUser() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     String? strUser = pref.getString('user');
     if (strUser != null) {

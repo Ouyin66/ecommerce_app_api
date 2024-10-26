@@ -8,8 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'customer/page/main.dart';
-import 'model/user.dart';
+import 'customer/page/mainpage.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -29,31 +28,30 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   void login() async {
     try {
-      var response = await APIRepository()
+      var response = await APIUser()
           .login(_emailController.text, _passwordController.text);
 
       // Kiểm tra phản hồi từ API
-      setState(() async {
-        errorEmail = null;
-        errorPassword = null;
 
-        if (response?.user != null) {
-          if (await saveUser(response!.user!)) {
-            showErrorDialog(context, "Đăng nhập thành công", false);
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const MainPage()));
-          } else {
-            print("Không saveUser được");
-          }
-        } else if (response?.errorMessageEmail != null) {
-          errorEmail = response?.errorMessageEmail;
-        } else if (response?.errorMessagePassword != null) {
-          errorPassword = response?.errorMessagePassword;
-        } else if (response?.errorMessage != null) {
-          showErrorDialog(context, response!.errorMessage!, true);
+      errorEmail = null;
+      errorPassword = null;
+
+      if (response?.user != null) {
+        if (await saveUser(response!.user!)) {
+          showErrorDialog(context, "Đăng nhập thành công", false);
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const MainPage()));
+        } else {
+          print("Không saveUser được");
         }
-        _formKey.currentState!.validate();
-      });
+      } else if (response?.errorMessageEmail != null) {
+        errorEmail = response?.errorMessageEmail;
+      } else if (response?.errorMessagePassword != null) {
+        errorPassword = response?.errorMessagePassword;
+      } else if (response?.errorMessage != null) {
+        showErrorDialog(context, response!.errorMessage!, true);
+      }
+      _formKey.currentState!.validate();
     } catch (ex) {
       print("Error: $ex");
       showErrorDialog(context, "Đăng nhập thất bại", true);
@@ -70,7 +68,22 @@ class _LoginWidgetState extends State<LoginWidget> {
           child: Center(
             child: Column(
               children: [
-                Logo(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      urlLogo2,
+                      fit: BoxFit.cover,
+                      width: 50,
+                      height: 50,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text("UNIQLO", style: subhead),
+                  ],
+                ),
                 SizedBox(
                   height: 50,
                 ),
@@ -248,25 +261,6 @@ class _LoginWidgetState extends State<LoginWidget> {
     );
   }
 
-  Widget Logo() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Image.asset(
-          urlLogo2,
-          fit: BoxFit.cover,
-          width: 50,
-          height: 50,
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text("UNIQLO", style: subhead),
-      ],
-    );
-  }
-
   Widget GoogleSignIn() {
     return SizedBox(
       width: double.infinity,
@@ -284,16 +278,13 @@ class _LoginWidgetState extends State<LoginWidget> {
             final googleUser = await GoogleSigninApi.login();
             print(googleUser);
             if (googleUser != null) {
-              var response = await APIRepository().SignInGoogle(
-                  googleUser.email,
-                  googleUser.id,
-                  googleUser.photoUrl,
-                  googleUser.displayName);
+              var response = await APIUser().signInGoogle(googleUser.email,
+                  googleUser.id, googleUser.photoUrl, googleUser.displayName);
               if (await saveUser(response!.user!)) {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const MainPage()));
               } else if (response.errorMessage != null) {
-                showErrorDialog(context, response!.errorMessage!, true);
+                showErrorDialog(context, response.errorMessage!, true);
               }
             }
           } catch (ex) {

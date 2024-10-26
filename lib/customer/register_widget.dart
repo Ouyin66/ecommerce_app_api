@@ -1,10 +1,10 @@
-import 'package:ecommerce_app_api/login_widget.dart';
-import 'package:ecommerce_app_api/webview.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../api/api.dart';
 import '../config/const.dart';
+import '../login_widget.dart';
+import '../webview.dart';
 
 class RegisterWidget extends StatefulWidget {
   const RegisterWidget({super.key});
@@ -29,7 +29,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
 
   void register() async {
     try {
-      var response = await APIRepository().register(_nameController.text,
+      var response = await APIUser().register(_nameController.text,
           _emailController.text, _passwordController.text);
 
       // Kiểm tra phản hồi từ API
@@ -63,7 +63,22 @@ class _RegisterWidgetState extends State<RegisterWidget> {
           child: Center(
             child: Column(
               children: [
-                Logo(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      urlLogo2,
+                      fit: BoxFit.cover,
+                      width: 50,
+                      height: 50,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text("UNIQLO", style: subhead),
+                  ],
+                ),
                 SizedBox(
                   height: 50,
                 ),
@@ -316,25 +331,6 @@ class _RegisterWidgetState extends State<RegisterWidget> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget Logo() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Image.asset(
-          urlLogo2,
-          fit: BoxFit.cover,
-          width: 50,
-          height: 50,
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text("UNIQLO", style: subhead),
-      ],
     );
   }
 

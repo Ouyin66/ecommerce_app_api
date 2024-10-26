@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../api/api.dart';
 import '../config/const.dart';
 import '../login_widget.dart';
@@ -18,8 +17,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
 
   void forgotPassword() async {
     try {
-      var response =
-          await APIRepository().forgotPassword(_emailController.text);
+      var response = await APIUser().forgotPassword(_emailController.text);
 
       setState(() {
         errorMessage = null;
@@ -51,7 +49,22 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
           child: Center(
             child: Column(
               children: [
-                Logo(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      urlLogo2,
+                      fit: BoxFit.cover,
+                      width: 50,
+                      height: 50,
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text("UNIQLO", style: subhead),
+                  ],
+                ),
                 SizedBox(
                   height: 40,
                 ),
@@ -190,25 +203,6 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget Logo() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Image.asset(
-          urlLogo2,
-          fit: BoxFit.cover,
-          width: 50,
-          height: 50,
-        ),
-        SizedBox(
-          width: 10,
-        ),
-        Text("UNIQLO", style: subhead),
-      ],
     );
   }
 

@@ -33,15 +33,51 @@ TextStyle body = GoogleFonts.barlow(
   fontWeight: FontWeight.normal,
 );
 
-TextStyle text = GoogleFonts.barlow(
-  fontSize: 18,
+TextStyle label20 = GoogleFonts.barlow(
+  fontSize: 20,
   color: blackColor,
-  fontWeight: FontWeight.normal,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle label = GoogleFonts.barlow(
+  fontSize: 24,
+  color: blackColor,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle labelGrey = GoogleFonts.barlow(
+  fontSize: 24,
+  color: greyColor,
+  fontWeight: FontWeight.bold,
 );
 
 TextStyle error = GoogleFonts.barlow(
   fontSize: 14,
   color: branchColor,
+  fontWeight: FontWeight.normal,
+);
+
+TextStyle productName = GoogleFonts.barlow(
+  fontSize: 26,
+  color: blackColor,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle categoryText = GoogleFonts.barlow(
+    fontSize: 16,
+    color: greyColor,
+    fontWeight: FontWeight.bold,
+    fontStyle: FontStyle.italic);
+
+TextStyle textPrice = GoogleFonts.barlow(
+  fontSize: 32,
+  color: blackColor,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle describe = GoogleFonts.barlow(
+  fontSize: 16,
+  color: blackColor,
   fontWeight: FontWeight.normal,
 );
 
@@ -97,7 +133,7 @@ void showErrorDialog(BuildContext context, String message, bool isError) {
             borderRadius: BorderRadius.all(Radius.circular(24)),
             side: BorderSide(
               color: isError ? branchColor : Colors.green,
-              width: 3,
+              width: 6,
             ),
           ),
           title: Column(
@@ -120,7 +156,7 @@ void showErrorDialog(BuildContext context, String message, bool isError) {
           ),
           content: Text(
             message,
-            style: text,
+            style: body,
           ),
           // actions: [
           //   TextButton(

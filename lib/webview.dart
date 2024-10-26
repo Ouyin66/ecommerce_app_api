@@ -1,12 +1,11 @@
 import 'package:ecommerce_app_api/config/const.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
 class WebView extends StatefulWidget {
   final String url;
 
-  WebView({required this.url});
+  const WebView({super.key, required this.url});
 
   @override
   _WebViewState createState() => _WebViewState();
