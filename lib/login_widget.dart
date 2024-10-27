@@ -7,8 +7,9 @@ import 'package:ecommerce_app_api/customer/register_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'customer/page/mainpage.dart';
+import 'main.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -17,7 +18,7 @@ class LoginWidget extends StatefulWidget {
   State<LoginWidget> createState() => _LoginWidgetState();
 }
 
-class _LoginWidgetState extends State<LoginWidget> {
+class _LoginWidgetState extends State<LoginWidget> with RouteAware {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -28,6 +29,8 @@ class _LoginWidgetState extends State<LoginWidget> {
 
   void login() async {
     try {
+      autoLogin();
+
       var response = await APIUser()
           .login(_emailController.text, _passwordController.text);
 
@@ -56,6 +59,41 @@ class _LoginWidgetState extends State<LoginWidget> {
       print("Error: $ex");
       showErrorDialog(context, "Đăng nhập thất bại", true);
     }
+  }
+
+  autoLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('user') != null) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => const MainPage()));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    autoLogin();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      MainApp.routeObserver.subscribe(this, route as PageRoute<dynamic>);
+    }
+  }
+
+  @override
+  void dispose() {
+    MainApp.routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    // Auto login when coming back to this widget
+    autoLogin();
   }
 
   @override

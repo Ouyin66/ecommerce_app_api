@@ -6,11 +6,8 @@ import 'package:ecommerce_app_api/customer/page/cart/cart_widget.dart';
 import 'package:ecommerce_app_api/model/category.dart';
 import 'package:ecommerce_app_api/model/product.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../model/gender.dart';
 import '../shopping/detail_product_widget.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -69,18 +66,20 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void removeSelectedCategory(int? id) {
-    selectedCategoryIDs.remove(id);
-    if (selectedCategoryIDs.isEmpty) {
-      filteredProducts = List.from(list!);
-    }
-    setState(() {});
+    setState(() {
+      selectedCategoryIDs.remove(id);
+      filterProducts();
+      if (selectedCategoryIDs.isEmpty) {
+        filteredProducts = List.from(list!);
+      }
+    });
   }
 
   void searching(String query) {
     // filteredProducts = List.from(list!);
 
     if (query != '') {
-      filteredProducts = list!
+      filteredProducts = filteredProducts!
           .where((p) => p.name!.toLowerCase().contains(query.toLowerCase()))
           .toList();
     } else {

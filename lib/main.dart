@@ -9,11 +9,14 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
+  static final RouteObserver<PageRoute> routeObserver =
+      RouteObserver<PageRoute>();
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginWidget(),
+      home: const LoginWidget(),
+      navigatorObservers: [routeObserver],
     );
   }
 }

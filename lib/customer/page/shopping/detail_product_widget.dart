@@ -33,6 +33,10 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
         ? null
         : widget.product.listSize?.firstWhere((s) => s.id == sizeId);
 
+    // _currentIndex = widget.product.listPicture!.indexWhere(
+    //   (picture) => picture == _selectedVariant?.picture,
+    // );
+
     if (sizeId != null) {
       _selectedVariant = widget.product.listVariant?.firstWhere(
         (v) => v.colorID == colorId && v.sizeID == sizeId,
@@ -43,6 +47,15 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
         (v) => v.colorID == colorId,
         orElse: () => Variant.variantEmpty(), // Trả về null nếu không tìm thấy
       );
+    }
+
+    _currentIndex = widget.product.listPicture!.indexWhere(
+      (picture) => picture.image == _selectedVariant?.picture,
+    );
+
+    // If not found, set _currentIndex to 0
+    if (_currentIndex == -1) {
+      _currentIndex = 0;
     }
 
     setState(() {});
@@ -84,7 +97,18 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
     sizeId = widget.product.listSize!.isEmpty
         ? null
         : widget.product.listSize?.first.id;
+
     getVariant();
+    print(_selectedVariant?.picture);
+
+    _currentIndex = widget.product.listPicture!.indexWhere(
+      (picture) => picture.image == _selectedVariant?.picture,
+    );
+
+    // If not found, set _currentIndex to 0
+    if (_currentIndex == -1) {
+      _currentIndex = 0;
+    }
   }
 
   @override

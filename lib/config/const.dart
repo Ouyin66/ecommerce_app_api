@@ -45,6 +45,19 @@ TextStyle label = GoogleFonts.barlow(
   fontWeight: FontWeight.bold,
 );
 
+TextStyle infoLabel = GoogleFonts.barlow(
+  fontSize: 18,
+  color: blackColor,
+  fontWeight: FontWeight.bold,
+);
+
+TextStyle info = GoogleFonts.barlow(
+  fontSize: 18,
+  color: greyColor,
+  fontWeight: FontWeight.bold,
+  fontStyle: FontStyle.italic,
+);
+
 TextStyle labelGrey = GoogleFonts.barlow(
   fontSize: 24,
   color: greyColor,
@@ -64,10 +77,11 @@ TextStyle productName = GoogleFonts.barlow(
 );
 
 TextStyle categoryText = GoogleFonts.barlow(
-    fontSize: 16,
-    color: greyColor,
-    fontWeight: FontWeight.bold,
-    fontStyle: FontStyle.italic);
+  fontSize: 16,
+  color: greyColor,
+  fontWeight: FontWeight.bold,
+  fontStyle: FontStyle.italic,
+);
 
 TextStyle textPrice = GoogleFonts.barlow(
   fontSize: 32,
