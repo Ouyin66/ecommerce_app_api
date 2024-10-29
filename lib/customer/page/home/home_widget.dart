@@ -1,6 +1,10 @@
 import 'package:ecommerce_app_api/api/apicategory.dart';
+import 'package:ecommerce_app_api/api/apicolor.dart';
 import 'package:ecommerce_app_api/api/apigender.dart';
+import 'package:ecommerce_app_api/api/apipicture.dart';
 import 'package:ecommerce_app_api/api/apiproduct.dart';
+import 'package:ecommerce_app_api/api/apisize.dart';
+import 'package:ecommerce_app_api/api/apivariant.dart';
 import 'package:ecommerce_app_api/config/const.dart';
 import 'package:ecommerce_app_api/customer/page/cart/cart_widget.dart';
 import 'package:ecommerce_app_api/model/category.dart';
@@ -18,7 +22,6 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
-  final TextEditingController _searchingController = TextEditingController();
   List<Product>? list = [];
   List<int> selectedCategoryIDs = [];
   List<Product> filteredProducts = [];
@@ -33,11 +36,11 @@ class _HomeWidgetState extends State<HomeWidget> {
     if (list != null) {
       for (var pro in list!) {
         pro.nameGender = await APIGender().getGender(pro.genderID!);
-        pro.nameCategory = await APIGender().getCategory(pro.genderID!);
-        pro.listPicture = await APIProduct().getPicturesByProduct(pro.id!);
-        pro.listVariant = await APIProduct().getVariantByProduct(pro.id!);
-        pro.listColor = await APIProduct().getColorByProduct(pro.id!);
-        pro.listSize = await APIProduct().getSizeByProduct(pro.id!);
+        pro.nameCategory = await APICategory().getCategory(pro.genderID!);
+        pro.listPicture = await APIPicture().getPicturesByProduct(pro.id!);
+        pro.listVariant = await APIVariant().getVariantByProduct(pro.id!);
+        pro.listColor = await APIColor().getColorByProduct(pro.id!);
+        pro.listSize = await APISize().getSizeByProduct(pro.id!);
       }
     }
     filteredProducts = List.from(list!);
@@ -76,14 +79,12 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   void searching(String query) {
-    // filteredProducts = List.from(list!);
-
     if (query != '') {
       filteredProducts = filteredProducts!
           .where((p) => p.name!.toLowerCase().contains(query.toLowerCase()))
           .toList();
     } else {
-      filteredProducts = List.from(list!);
+      filterProducts();
     }
 
     setState(() {});
@@ -93,8 +94,6 @@ class _HomeWidgetState extends State<HomeWidget> {
   void initState() {
     super.initState();
     getProduct();
-    // filteredProducts = List.from(list!);
-    // filterProducts();
   }
 
   @override

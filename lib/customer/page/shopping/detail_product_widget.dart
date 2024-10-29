@@ -1,3 +1,4 @@
+import 'package:ecommerce_app_api/api/apicart.dart';
 import 'package:ecommerce_app_api/config/const.dart';
 import 'package:ecommerce_app_api/model/color.dart';
 import 'package:ecommerce_app_api/model/product.dart';
@@ -6,6 +7,9 @@ import 'package:ecommerce_app_api/model/variant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+
+import '../../../api/sharepre.dart';
+import '../../../model/user.dart';
 
 class ProductDetailWidget extends StatefulWidget {
   final Product product;
@@ -16,7 +20,8 @@ class ProductDetailWidget extends StatefulWidget {
 }
 
 class _ProductDetailWidgetState extends State<ProductDetailWidget> {
-  int _currentIndex = 0; // Chỉ số hình ảnh hiện tại
+  User? user;
+  int _currentIndex = 0;
   bool _isVisible = false;
 
   Variant? _selectedVariant;
@@ -33,19 +38,15 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
         ? null
         : widget.product.listSize?.firstWhere((s) => s.id == sizeId);
 
-    // _currentIndex = widget.product.listPicture!.indexWhere(
-    //   (picture) => picture == _selectedVariant?.picture,
-    // );
-
     if (sizeId != null) {
       _selectedVariant = widget.product.listVariant?.firstWhere(
         (v) => v.colorID == colorId && v.sizeID == sizeId,
-        orElse: () => Variant.variantEmpty(), // Trả về null nếu không tìm thấy
+        orElse: () => Variant.variantEmpty(),
       );
     } else {
       _selectedVariant = widget.product.listVariant?.firstWhere(
         (v) => v.colorID == colorId,
-        orElse: () => Variant.variantEmpty(), // Trả về null nếu không tìm thấy
+        orElse: () => Variant.variantEmpty(),
       );
     }
 
@@ -53,7 +54,6 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
       (picture) => picture.image == _selectedVariant?.picture,
     );
 
-    // If not found, set _currentIndex to 0
     if (_currentIndex == -1) {
       _currentIndex = 0;
     }
@@ -90,9 +90,20 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
     });
   }
 
+  void getDataUser() async {
+    user = await getUser();
+    if (user != null) {
+      print("Tìm thấy user");
+    } else {
+      print("Không tìm thấy user");
+    }
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
+    getDataUser();
     colorId = widget.product.listColor?.first.id;
     sizeId = widget.product.listSize!.isEmpty
         ? null
@@ -105,7 +116,6 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
       (picture) => picture.image == _selectedVariant?.picture,
     );
 
-    // If not found, set _currentIndex to 0
     if (_currentIndex == -1) {
       _currentIndex = 0;
     }
@@ -685,10 +695,10 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                               IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    plusQuantity();
+                                    minusQuantity();
                                   });
                                 },
-                                icon: Icon(Icons.add_rounded),
+                                icon: Icon(Icons.remove_rounded),
                               ),
                               Container(
                                 width: 1,
@@ -713,10 +723,10 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                               IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    minusQuantity();
+                                    plusQuantity();
                                   });
                                 },
-                                icon: Icon(Icons.remove_rounded),
+                                icon: Icon(Icons.add_rounded),
                               ),
                             ],
                           ),
@@ -736,8 +746,18 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                       child: FilledButton(
                         onPressed: _selectedVariant!.quantity! == 0
                             ? null
-                            : () {
-                                _myShowBottomSheet(context);
+                            : () async {
+                                var addToCart = await APICart().insertCart(
+                                    user!.id!,
+                                    _selectedVariant!.id!,
+                                    _quantity,
+                                    _selectedVariant!.price!);
+                                if (addToCart?.successMessage != null) {
+                                  print(addToCart?.successMessage);
+                                  Navigator.pop(context);
+                                } else {
+                                  print(addToCart?.errorMessage);
+                                }
                               },
                         style: FilledButton.styleFrom(
                           shape: RoundedRectangleBorder(

@@ -8,14 +8,11 @@ class APICategory extends APIRepository {
     try {
       Uri uri = Uri.parse("$baseurl/Category/List");
 
-      // Gửi yêu cầu GET đến API
       final response = await http.get(uri);
 
-      // Kiểm tra trạng thái phản hồi
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        // Parse danh sách sản phẩm
         List<Category> categories = (data['dataa'] as List)
             .map((categoryJson) => Category.fromJson(categoryJson))
             .toList();
@@ -31,30 +28,27 @@ class APICategory extends APIRepository {
     }
   }
 
-  // Future<List<MySize>?> getSizeByProduct(int productId) async {
-  //   try {
-  //     Uri uri =
-  //         Uri.parse("$baseurl/Size/ListByProductId").replace(queryParameters: {
-  //       'productId': productId.toString(),
-  //     });
+  Future<Category?> getCategory(int id) async {
+    try {
+      Uri uri = Uri.parse("$baseurl/Category/Get").replace(queryParameters: {
+        'id': id.toString(),
+      });
 
-  //     final response = await http.get(uri);
+      final response = await http.get(uri);
 
-  //     if (response.statusCode == 200) {
-  //       final Map<String, dynamic> data = jsonDecode(response.body);
-
-  //       List<MySize> sizes = (data['sizes'] as List)
-  //           .map((sizeJson) => MySize.fromJson(sizeJson))
-  //           .toList();
-
-  //       return sizes;
-  //     } else {
-  //       print("Lỗi khi lấy danh sách hình ảnh: ${response.statusCode}");
-  //       return [];
-  //     }
-  //   } catch (e) {
-  //     print("Lỗi: $e");
-  //     return [];
-  //   }
-  // }
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return Category.fromJson(data['category']);
+      } else if (response.statusCode == 404) {
+        print("Không tìm thấy loại sản phẩm này");
+        return null;
+      } else {
+        print("Lỗi không xác định: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Lỗi kết nối đến máy chủ: $e");
+      return null;
+    }
+  }
 }

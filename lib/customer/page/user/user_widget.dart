@@ -1,3 +1,4 @@
+import 'package:ecommerce_app_api/model/selectedcart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../api/sharepre.dart';
@@ -7,6 +8,7 @@ import '../../../model/user.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class UserWidget extends StatefulWidget {
   const UserWidget({super.key});
@@ -20,6 +22,7 @@ class _UserWidgetState extends State<UserWidget> {
 
   void logout() async {
     await deleteUser();
+    SelectedCart().MakeNull();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString('user') == null) {
       user = User.userEmpty();
@@ -27,6 +30,7 @@ class _UserWidgetState extends State<UserWidget> {
         context,
         MaterialPageRoute(builder: (context) => const LoginWidget()),
       );
+      print("Đăng xuất thành công");
     } else {
       print("Đăng xuất không thành công");
     }
@@ -51,7 +55,7 @@ class _UserWidgetState extends State<UserWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: whiteColor,
+      backgroundColor: whiteColor.withOpacity(0.97),
       appBar: AppBar(
         backgroundColor: whiteColor,
         surfaceTintColor: whiteColor,
