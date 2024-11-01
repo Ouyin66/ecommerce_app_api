@@ -3,7 +3,6 @@ class User {
   String? email;
   String? password;
   String? name;
-  String? location;
   String? phone;
   String? image;
   int? gender;
@@ -17,7 +16,6 @@ class User {
     this.email,
     this.password,
     this.name,
-    this.location,
     this.phone,
     this.image,
     this.gender,
@@ -33,7 +31,6 @@ class User {
       email: '',
       password: '',
       name: '',
-      location: '',
       phone: '',
       image: '',
       gender: null,
@@ -51,7 +48,6 @@ class User {
       password: json["password"] ?? '',
       name: json["name"] ?? '',
       image: json["image"] == null || json["image"] == '' ? "" : json["image"],
-      location: json["location"] ?? '',
       phone: json["phone"] ?? '',
       gender: json["gender"] ?? 0,
       state: json["state"] ?? 0,
@@ -67,7 +63,6 @@ class User {
       "email": email,
       "password": password, // Consider not storing the password in plain text
       "name": name,
-      "location": location,
       "phone": phone,
       "image": image,
       "gender": gender,

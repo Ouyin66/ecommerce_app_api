@@ -2,8 +2,8 @@ import 'package:ecommerce_app_api/api/api.dart';
 import 'package:ecommerce_app_api/api/google_signin_api.dart';
 import 'package:ecommerce_app_api/api/sharepre.dart';
 import 'package:ecommerce_app_api/config/const.dart';
-import 'package:ecommerce_app_api/customer/forgot_password_widget.dart';
-import 'package:ecommerce_app_api/customer/register_widget.dart';
+import 'package:ecommerce_app_api/forgot_password_widget.dart';
+import 'package:ecommerce_app_api/register_widget.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,7 +41,7 @@ class _LoginWidgetState extends State<LoginWidget> with RouteAware {
 
       if (response?.user != null) {
         if (await saveUser(response!.user!)) {
-          showErrorDialog(context, "Đăng nhập thành công", false);
+          showToast(context, "Đăng nhập thành công");
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const MainPage()));
         } else {
@@ -52,12 +52,12 @@ class _LoginWidgetState extends State<LoginWidget> with RouteAware {
       } else if (response?.errorMessagePassword != null) {
         errorPassword = response?.errorMessagePassword;
       } else if (response?.errorMessage != null) {
-        showErrorDialog(context, response!.errorMessage!, true);
+        showToast(context, response!.errorMessage!, isError: true);
       }
       _formKey.currentState!.validate();
     } catch (ex) {
       print("Error: $ex");
-      showErrorDialog(context, "Đăng nhập thất bại", true);
+      showToast(context, "Đăng nhập thất bại", isError: true);
     }
   }
 
@@ -322,12 +322,12 @@ class _LoginWidgetState extends State<LoginWidget> with RouteAware {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const MainPage()));
               } else if (response.errorMessage != null) {
-                showErrorDialog(context, response.errorMessage!, true);
+                showToast(context, response.errorMessage!, isError: true);
               }
             }
           } catch (ex) {
             print("Error: $ex");
-            showErrorDialog(context, "Đăng nhập thất bại", true);
+            showToast(context, "Đăng nhập thất bại", isError: true);
           }
         },
         child: Padding(

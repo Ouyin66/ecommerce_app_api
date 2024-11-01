@@ -42,8 +42,8 @@ class _HomeWidgetState extends State<HomeWidget> {
         pro.listColor = await APIColor().getColorByProduct(pro.id!);
         pro.listSize = await APISize().getSizeByProduct(pro.id!);
       }
+      filteredProducts = List.from(list!);
     }
-    filteredProducts = List.from(list!);
     setState(() {});
   }
 

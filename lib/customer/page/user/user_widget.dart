@@ -1,14 +1,19 @@
+import 'package:ecommerce_app_api/customer/page/user/change_password_widget.dart';
+import 'package:ecommerce_app_api/customer/page/user/location_widget.dart';
 import 'package:ecommerce_app_api/model/selectedcart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
 import '../../../login_widget.dart';
+import '../../../main.dart';
 import '../../../model/user.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import 'edit_user_widget.dart';
 
 class UserWidget extends StatefulWidget {
   const UserWidget({super.key});
@@ -17,8 +22,8 @@ class UserWidget extends StatefulWidget {
   State<UserWidget> createState() => _UserWidgetState();
 }
 
-class _UserWidgetState extends State<UserWidget> {
-  User user = User.userEmpty();
+class _UserWidgetState extends State<UserWidget> with RouteAware {
+  User? user = User.userEmpty();
 
   void logout() async {
     await deleteUser();
@@ -36,6 +41,16 @@ class _UserWidgetState extends State<UserWidget> {
     }
   }
 
+  void checkLogout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('user') == null) {
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const LoginWidget()));
+    } else {
+      getDataUser();
+    }
+  }
+
   void getDataUser() async {
     user = await getUser();
     if (user != null) {
@@ -46,6 +61,10 @@ class _UserWidgetState extends State<UserWidget> {
     setState(() {});
   }
 
+  void deleteAccount() async {
+    print("Xóa tài khoản");
+  }
+
   @override
   void initState() {
     super.initState();
@@ -53,9 +72,29 @@ class _UserWidgetState extends State<UserWidget> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      MainApp.routeObserver.subscribe(this, route as PageRoute<dynamic>);
+    }
+  }
+
+  @override
+  void dispose() {
+    MainApp.routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    checkLogout();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: whiteColor.withOpacity(0.97),
+      backgroundColor: whiteColor,
       appBar: AppBar(
         backgroundColor: whiteColor,
         surfaceTintColor: whiteColor,
@@ -77,164 +116,301 @@ class _UserWidgetState extends State<UserWidget> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: whiteColor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: whiteColor,
+      body: user?.id == null
+          ? LoadingScreen()
+          : SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 20,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.25),
-                        spreadRadius: 2,
-                        blurRadius: 1,
-                        offset: Offset(0, 2.5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            height: 80,
-                            width: 80,
-                            margin: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              border: Border.all(),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(60)),
-                              image: DecorationImage(
-                                image: NetworkImage("${user.image}"),
-                                fit: BoxFit.cover,
-                                onError: (exception, stackTrace) =>
-                                    const Icon(Icons.image),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              text: 'Xin chào,',
-                              style: GoogleFonts.barlow(
-                                fontSize: 20,
-                                color: blackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: '\n${user.name}',
-                                  style: label20,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Spacer(),
-                          IconButton(
-                            onPressed: () {
-                              logout();
-                            },
-                            icon: Icon(
-                              Icons.logout_rounded,
-                              color: branchColor,
-                              size: 40,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: whiteColor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: whiteColor,
+                    Stack(
+                      children: [
+                        buildImage(128),
+                        Positioned(
+                          bottom: 0,
+                          right: 4,
+                          child: buildEditIcon(branchColor),
+                        ),
+                      ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.25),
-                        spreadRadius: 2,
-                        blurRadius: 1,
-                        offset: Offset(0, 2.5),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      information("Email: ", user.email.toString()),
-                      information(
-                          "Số điện thoại: ",
-                          user.phone != ''
-                              ? user.phone.toString()
-                              : "Chưa cung cấp"),
-                      information(
-                          "Địa chỉ giao hàng: ",
-                          user.location != ''
-                              ? user.location.toString()
-                              : "Chưa cung cấp"),
-                      information(
-                          "Giới tính: ",
-                          user.gender != null
-                              ? (user.gender == 0)
-                                  ? "Nam"
-                                  : "Nữ"
-                              : "Chưa cung cấp"),
-                      information(
-                          "Ngày tạo tài khoản: ",
-                          user.dateCreate != ''
-                              ? DateFormat('dd-MM-yyyy HH:mm:ss').format(
-                                  DateTime.parse(user.dateCreate.toString()))
-                              : "Chưa cập nhật"),
-                    ],
-                  ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    buildName(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    buildBox(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    builSecondBox(),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    builThirdBox()
+                  ],
                 ),
-              ],
+              ),
             ),
+    );
+  }
+
+  Widget buildImage(double size) {
+    return ClipOval(
+      child: Material(
+        color: Colors.transparent,
+        child: Ink.image(
+          image: NetworkImage(user!.image!),
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          child: InkWell(
+            onTap: () {},
           ),
         ),
       ),
     );
   }
 
-  Widget information(String title, String data) {
-    return Row(
+  Widget buildEditIcon(Color color) => buildCircle(
+        color: whiteColor,
+        all: 3,
+        child: buildCircle(
+          color: color,
+          all: 8,
+          child: Icon(
+            Icons.edit,
+            size: 20,
+            color: whiteColor,
+          ),
+        ),
+      );
+
+  Widget buildCircle({
+    required Color color,
+    required double all,
+    required Widget child,
+  }) =>
+      ClipOval(
+        child: Container(
+          padding: EdgeInsets.all(all),
+          color: color,
+          child: child,
+        ),
+      );
+
+  Widget buildName() {
+    return Column(
       children: [
         Text(
-          title,
-          style: infoLabel,
+          user?.name ?? '',
+          style: head,
         ),
         SizedBox(
-          width: 5,
+          height: 4,
         ),
         Text(
-          data,
-          style: info,
-          softWrap: true,
-          maxLines: 3,
+          user?.email ?? '',
+          style: GoogleFonts.barlow(
+            fontSize: 18,
+            color: greyColor,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildBox() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: Container(
+            // width: 300,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: greyColor.withOpacity(0.2),
+              borderRadius: BorderRadius.all(
+                Radius.circular(26),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildButton(
+                  Icons.password_rounded,
+                  "Đổi mật khẩu",
+                  widget: ChangePasswordWidget(user: user!),
+                ),
+                Divider(
+                  height: 30,
+                ),
+                buildButton(
+                  Icons.edit_note_rounded,
+                  "Chỉnh sửa thông tin người dùng",
+                  widget: EditUserWidget(),
+                ),
+                Divider(
+                  height: 30,
+                ),
+                buildButton(
+                  Icons.location_on_outlined,
+                  "Địa chỉ giao hàng",
+                  widget: LocationWidget(),
+                ),
+                Divider(
+                  height: 30,
+                ),
+                buildButton(Icons.logout_rounded, "Đăng xuất", isLogout: true),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget builSecondBox() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: Container(
+            // width: 300,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: greyColor.withOpacity(0.2),
+              borderRadius: BorderRadius.all(
+                Radius.circular(26),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildButton(
+                  Icons.settings_outlined,
+                  "Cài đặt",
+                ),
+                Divider(
+                  height: 30,
+                ),
+                buildButton(Icons.delete_forever_rounded, "Xóa tài khoản",
+                    function: deleteAccount, isLogout: true),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildButton(IconData icon, String label,
+      {Widget? widget = null, Function? function, bool isLogout = false}) {
+    return InkWell(
+      onTap: () {
+        if (isLogout && function != null) {
+          function();
+        } else if (isLogout) {
+          logout();
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => widget!),
+          );
+        }
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 24,
+            color: isLogout ? branchColor : blackColor,
+          ),
+          SizedBox(
+            width: 15,
+          ),
+          Expanded(
+            child: Text(
+              label,
+              style: GoogleFonts.barlow(
+                fontSize: 18,
+                color: isLogout ? branchColor : blackColor,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+                // height: 1,
+              ),
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              maxLines: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget builThirdBox() {
+    // var dateTime = DateFormat("yyyy-MM-ddThh:mm:ss").parse(user!.dateCreate!);
+    // // DateTime dateTime =
+    // //     DateTime.parse(user!.dateCreate.toString().replaceAll(' ', 'T'));
+    // var formattedDate = DateFormat('HH:mm:ss dd/MM/yyyy').format(dateTime);
+    DateTime dateTime = DateTime.parse(user!.dateCreate!);
+    var formattedDate = DateFormat('HH:mm:ss dd/MM/yyyy').format(dateTime);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: Container(
+            // width: 300,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: greyColor.withOpacity(0.2),
+              borderRadius: BorderRadius.all(
+                Radius.circular(26),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Phiên bản của ứng dụng 1.1.1.1",
+                  style: GoogleFonts.barlow(
+                    fontSize: 18,
+                    color: blackColor,
+                    fontWeight: FontWeight.w300,
+                    fontStyle: FontStyle.normal,
+                    // height: 1,
+                  ),
+                ),
+                Divider(
+                  height: 20,
+                ),
+                Text(
+                  "Tài khoản tạo ngày: ${formattedDate}",
+                  style: GoogleFonts.barlow(
+                    fontSize: 18,
+                    color: blackColor,
+                    fontWeight: FontWeight.w300,
+                    fontStyle: FontStyle.normal,
+                    // height: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

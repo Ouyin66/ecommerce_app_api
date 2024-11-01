@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../api/api.dart';
-import '../config/const.dart';
-import '../login_widget.dart';
+import 'api/api.dart';
+import 'config/const.dart';
+import 'login_widget.dart';
 
 class ForgotPasswordWidget extends StatefulWidget {
   const ForgotPasswordWidget({super.key});
@@ -23,19 +23,19 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
         errorMessage = null;
 
         if (response?.successMessage != null) {
-          showErrorDialog(context, response!.successMessage!, false);
+          showToast(context, response!.successMessage!);
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const LoginWidget()));
         } else if (response?.errorMessageEmail != null) {
           errorMessage = response?.errorMessageEmail;
         } else if (response?.errorMessage != null) {
-          showErrorDialog(context, response!.errorMessage!, true);
+          showToast(context, response!.errorMessage!, isError: true);
         }
         _formKey.currentState!.validate();
       });
     } catch (ex) {
       print("Error: $ex");
-      showErrorDialog(context, "Khôi phục thất bại", true);
+      showToast(context, "Khôi phục thất bại", isError: true);
     }
   }
 

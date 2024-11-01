@@ -109,4 +109,57 @@ class APIUser extends APIRepository {
       return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
     }
   }
+
+  Future<MessageResponse?> changePassword(int id, String? newPassword) async {
+    try {
+      Uri uri =
+          Uri.parse("$baseurl/User/ChangePassword").replace(queryParameters: {
+        'id': id.toString(),
+        'newPassword': newPassword,
+      });
+
+      final response = await http.put(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return MessageResponse(
+            user: User.fromJson(data['user']), successMessage: data['message']);
+      } else if (response.statusCode == 404) {
+        return MessageResponse(errorMessage: "Người dùng không tồn tại");
+      } else {
+        return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
+      }
+    } catch (e) {
+      print("Lỗi: $e với baseurl: $baseurl");
+      return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
+    }
+  }
+
+  Future<MessageResponse?> updateInformation(User user) async {
+    try {
+      Uri uri = Uri.parse("$baseurl/User/UpdateInformation")
+          .replace(queryParameters: {
+        'id': user.id.toString(),
+        'name': user.name.toString(),
+        'phone': user.phone.toString(),
+        'image': user.image.toString(),
+        'gender': user.gender.toString(),
+      });
+
+      final response = await http.put(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return MessageResponse(
+            user: User.fromJson(data['user']), successMessage: data['message']);
+      } else if (response.statusCode == 404) {
+        return MessageResponse(errorMessage: "Người dùng không tồn tại");
+      } else {
+        return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
+      }
+    } catch (e) {
+      print("Lỗi: $e với baseurl: $baseurl");
+      return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
+    }
+  }
 }

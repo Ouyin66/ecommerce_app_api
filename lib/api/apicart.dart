@@ -74,7 +74,7 @@ class APICart extends APIRepository {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        Cart? cart = Cart.fromJson(data['searchingCart']);
+        Cart? cart = Cart.fromJson(data['cart']);
 
         return MessageResponse(cart: cart, successMessage: data['message']);
       } else {

@@ -1,10 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../api/api.dart';
-import '../config/const.dart';
-import '../login_widget.dart';
-import '../webview.dart';
+import 'api/api.dart';
+import 'config/const.dart';
+import 'login_widget.dart';
+import 'webview.dart';
 
 class RegisterWidget extends StatefulWidget {
   const RegisterWidget({super.key});
@@ -37,19 +37,19 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         errorEmail = null;
 
         if (response?.user != null) {
-          showErrorDialog(context, "Đăng ký thành công", false);
+          showToast(context, "Đăng ký thành công");
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const LoginWidget()));
         } else if (response?.errorMessageEmail != null) {
           errorEmail = response?.errorMessageEmail;
         } else if (response?.errorMessage != null) {
-          showErrorDialog(context, response!.errorMessage!, true);
+          showToast(context, response!.errorMessage!, isError: true);
         }
         _formKey.currentState!.validate();
       });
     } catch (ex) {
       print("Error: $ex");
-      showErrorDialog(context, "Đăng ký thất bại", true);
+      showToast(context, "Đăng ký thất bại", isError: true);
     }
   }
 

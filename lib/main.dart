@@ -1,3 +1,4 @@
+import 'package:ecommerce_app_api/config/const.dart';
 import 'package:ecommerce_app_api/model/selectedcart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,9 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        dividerColor: blackColor,
+      ),
       home: const LoginWidget(),
       navigatorObservers: [routeObserver],
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 // COLOR
 const branchColor = Color(0xFFED1B24);
@@ -132,59 +133,53 @@ dynamic ErrorFocusBorder() {
   );
 }
 
+// Loading Screen
+Widget LoadingScreen() {
+  return const Center(
+    child: CircularProgressIndicator(
+      color: branchColor,
+      backgroundColor: whiteColor,
+    ),
+  );
+}
+
 // Show Dialog
-void showErrorDialog(BuildContext context, String message, bool isError) {
-  Future.delayed(const Duration(seconds: 0), () {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        Future.delayed(Duration(seconds: isError ? 30 : 3), () {
-          Navigator.of(context).pop();
-        });
-        return AlertDialog(
-          backgroundColor: Colors.white.withOpacity(0.8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(24)),
-            side: BorderSide(
-              color: isError ? branchColor : Colors.green,
-              width: 6,
+void showToast(BuildContext context, String message, {bool isError = false}) {
+  FToast fToast = FToast();
+  fToast.init(context);
+  Widget toast = Container(
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(8),
+      color: isError ? branchColor : Colors.green,
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          isError ? Icons.cancel : Icons.check,
+          color: whiteColor,
+        ),
+        SizedBox(
+          width: 12,
+        ),
+        Expanded(
+          child: Text(
+            message,
+            style: GoogleFonts.barlow(
+              fontSize: 13,
+              color: whiteColor,
+              fontWeight: FontWeight.normal,
+              // fontStyle: FontStyle.italic,
             ),
           ),
-          title: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                isError
-                    ? Icons.cancel_outlined
-                    : Icons.check_circle_outline_rounded,
-                color: isError ? branchColor : Colors.green,
-                size: 100,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                isError ? "Lỗi" : "Thành công",
-                style: head,
-              ),
-            ],
-          ),
-          content: Text(
-            message,
-            style: body,
-          ),
-          // actions: [
-          //   TextButton(
-          //     onPressed: () {
-          //       Navigator.of(context).pop();
-          //     },
-          //     child: Text(
-          //       "OK",
-          //       style: subhead,
-          //     ),
-          //   ),
-          // ],
-        );
-      },
-    );
-  });
+        ),
+      ],
+    ),
+  );
+  fToast.showToast(
+    child: toast,
+    toastDuration: const Duration(seconds: 6),
+    gravity: ToastGravity.BOTTOM,
+  );
 }

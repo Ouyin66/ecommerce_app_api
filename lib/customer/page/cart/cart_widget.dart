@@ -86,7 +86,7 @@ class _CartWidgetState extends State<CartWidget> {
 
   void reload() {
     Navigator.pop(context);
-    getDataUser();
+    getList(user.id!);
   }
 
   void minus(Cart cart) async {
@@ -165,7 +165,7 @@ class _CartWidgetState extends State<CartWidget> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 90),
               child: SingleChildScrollView(
                 child: Center(
                   child: Column(
@@ -464,56 +464,62 @@ class _CartWidgetState extends State<CartWidget> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(16)),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      IconButton(
-                                        iconSize: 15,
-                                        onPressed: () {
-                                          setState(() {
-                                            minus(item);
-                                          });
-                                        },
-                                        icon: Icon(
-                                          Icons.remove_rounded,
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 1,
-                                        height: 15,
-                                        color: Colors.grey,
-                                      ),
-                                      Container(
-                                        alignment: Alignment.center,
-                                        width: 40,
-                                        child: Text(
-                                          item.quantity.toString(),
-                                          style: GoogleFonts.barlow(
-                                            fontSize: 15,
-                                            color: blackColor,
-                                            fontWeight: FontWeight.bold,
+                                  child: IntrinsicHeight(
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          iconSize: 15,
+                                          onPressed: () {
+                                            setState(() {
+                                              minus(item);
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.remove_rounded,
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        width: 1,
-                                        height: 15,
-                                        color: Colors.grey,
-                                      ),
-                                      IconButton(
-                                        iconSize: 15,
-                                        onPressed: () {
-                                          setState(() {
-                                            plus(item);
-                                          });
-                                        },
-                                        icon: Icon(
-                                          Icons.add_rounded,
+                                        Container(
+                                          height: 15,
+                                          child: VerticalDivider(
+                                            width: 1,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                        Container(
+                                          alignment: Alignment.center,
+                                          width: 40,
+                                          child: Text(
+                                            item.quantity.toString(),
+                                            style: GoogleFonts.barlow(
+                                              fontSize: 15,
+                                              color: blackColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          height: 15,
+                                          child: VerticalDivider(
+                                            width: 1,
+                                          ),
+                                        ),
+                                        IconButton(
+                                          iconSize: 15,
+                                          onPressed: () {
+                                            setState(() {
+                                              plus(item);
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.add_rounded,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Spacer(),
@@ -641,6 +647,8 @@ class _CartWidgetState extends State<CartWidget> {
         sizeId = _selectedVariant.sizeID;
       }
     });
+
+    var selectedCart = Provider.of<SelectedCart>(context, listen: false);
     return showModalBottomSheet(
       context: context,
       builder: (BuildContext contextSheet) {
@@ -879,8 +887,20 @@ class _CartWidgetState extends State<CartWidget> {
                                     _selectedVariant.price!);
                                 if (response?.successMessage != null) {
                                   print(response?.successMessage);
-
                                   reload();
+                                  var existing =
+                                      list?.firstWhere((c) => c.id == cart.id);
+                                  if (list!.contains(existing)) {
+                                    if (selectedCart.selected(cart)) {
+                                      selectedCart.Remove(cart);
+                                      selectedCart.Update(response!.cart!);
+                                    }
+                                  } else {
+                                    if (selectedCart
+                                        .selected(response!.cart!)) {
+                                      selectedCart.Update(response.cart!);
+                                    }
+                                  }
                                 } else {
                                   print(response?.errorMessage);
                                 }
@@ -950,11 +970,10 @@ class _CartWidgetState extends State<CartWidget> {
               onPressed: () async {
                 var response = await APICart().deleteCart(cart.id!);
                 if (response?.successMessage != null) {
-                  getList(user.id!);
                   if (selectedCart.selected(cart)) {
                     selectedCart.Remove(cart);
                   }
-                  Navigator.pop(context);
+                  reload();
                 } else {
                   print(response?.errorMessage);
                 }
