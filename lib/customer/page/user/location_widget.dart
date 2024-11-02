@@ -109,8 +109,11 @@ class _LocationWidgetState extends State<LocationWidget> {
     if (response?.successMessage != null) {
       getList();
       Navigator.pop(context);
-      _nameController.clear();
-      _addressController.clear();
+      // _nameController.clear();
+      // _addressController.clear();
+      if (_idLocation != null) {
+        _isEdit = true;
+      }
       showToast(context, response!.successMessage!);
     } else if (response?.errorMessage != null) {
       showToast(context, response!.errorMessage!, isError: true);
