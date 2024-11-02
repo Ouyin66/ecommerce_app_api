@@ -80,7 +80,7 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   void searching(String query) {
     if (query != '') {
-      filteredProducts = filteredProducts!
+      filteredProducts = filteredProducts
           .where((p) => p.name!.toLowerCase().contains(query.toLowerCase()))
           .toList();
     } else {
@@ -112,45 +112,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                   children: [
                     Expanded(
                       flex: 13,
-                      child: Container(
-                        height: 50,
-                        decoration: const BoxDecoration(),
-                        child: TextField(
-                          onChanged: (text) {
-                            setState(() {
-                              _query = text;
-                              searching(_query);
-                            });
-                          },
-                          // controller: _searchingController,
-                          decoration: const InputDecoration(
-                            labelText: "Tìm kiếm...",
-                            labelStyle: TextStyle(color: blackColor),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(16.0),
-                              ),
-                              borderSide: BorderSide(color: blackColor),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(16.0),
-                              ),
-                              borderSide:
-                                  BorderSide(color: blackColor, width: 1),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(16.0),
-                              ),
-                              borderSide:
-                                  BorderSide(color: blackColor, width: 2),
-                            ),
-                            prefixIcon: Icon(Icons.search_rounded),
-                          ),
-                          cursorColor: blackColor,
-                        ),
-                      ),
+                      child: _buildSearching(),
                     ),
                     Spacer(),
                     Expanded(
@@ -462,6 +424,45 @@ class _HomeWidgetState extends State<HomeWidget> {
           width: 10,
         ),
       ],
+    );
+  }
+
+  Widget _buildSearching() {
+    return Container(
+      height: 50,
+      decoration: const BoxDecoration(),
+      child: TextField(
+        onChanged: (text) {
+          setState(() {
+            _query = text;
+            searching(_query);
+          });
+        },
+        decoration: const InputDecoration(
+          labelText: "Tìm kiếm...",
+          labelStyle: TextStyle(color: blackColor),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(16.0),
+            ),
+            borderSide: BorderSide(color: blackColor),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(16.0),
+            ),
+            borderSide: BorderSide(color: blackColor, width: 1),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(16.0),
+            ),
+            borderSide: BorderSide(color: blackColor, width: 2),
+          ),
+          prefixIcon: Icon(Icons.search_rounded),
+        ),
+        cursorColor: blackColor,
+      ),
     );
   }
 }

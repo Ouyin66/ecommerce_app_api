@@ -8,6 +8,12 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>Ecommerce App Api</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Used to demontrate iamge picker plugin</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Used to demontrate iamge picker plugin</string>
+	<key>NSMicrophoneUsageDescription </key>
+	<string>Used to capture audio for iamge picker plugin</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

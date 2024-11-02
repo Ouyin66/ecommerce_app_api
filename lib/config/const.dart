@@ -179,7 +179,7 @@ void showToast(BuildContext context, String message, {bool isError = false}) {
   );
   fToast.showToast(
     child: toast,
-    toastDuration: const Duration(seconds: 6),
+    toastDuration: const Duration(seconds: 3),
     gravity: ToastGravity.BOTTOM,
   );
 }

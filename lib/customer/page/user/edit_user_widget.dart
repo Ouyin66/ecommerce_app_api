@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ecommerce_app_api/model/selectedcart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditUserWidget extends StatefulWidget {
   const EditUserWidget({super.key});
@@ -28,9 +31,33 @@ class _EditUserWidgetState extends State<EditUserWidget> {
   final TextEditingController _dateCreateController = TextEditingController();
   int? _selectedGender;
   User user = User.userEmpty();
+  String? _selectedImage;
 
   void changeInformation() async {
     var response = await APIUser().updateInformation(user);
+    if (response?.user != null) {
+      if (await saveUser(response!.user!)) {
+        if (response.successMessage != null) {
+          showToast(context, response.successMessage!);
+        }
+        print(
+            "${response.user!.id}, ${response.user!.name}, ${response.user!.phone}, ${response.user!.gender}");
+        getDataUser();
+        _selectedImage = '';
+      } else {
+        print("Không saveUser được");
+      }
+    } else if (response?.errorMessageEmail != null) {
+      showToast(context, response!.errorMessageEmail!, isError: true);
+    }
+  }
+
+  void updatePicture() async {
+    if (_selectedImage != null) {
+      user?.image = _selectedImage;
+    }
+
+    var response = await APIUser().updateInformation(user!);
     if (response?.user != null) {
       if (await saveUser(response!.user!)) {
         if (response.successMessage != null) {
@@ -104,7 +131,7 @@ class _EditUserWidgetState extends State<EditUserWidget> {
               children: [
                 Stack(
                   children: [
-                    buildImage(),
+                    buildImage(128),
                     Positioned(
                       bottom: 0,
                       right: 4,
@@ -142,18 +169,57 @@ class _EditUserWidgetState extends State<EditUserWidget> {
     );
   }
 
-  Widget buildImage() {
+  Widget buildImage(double size) {
+    final imageUrl;
+    if (user?.image == null || user?.image == '') {
+      imageUrl = urlLogo;
+    } else {
+      imageUrl = user?.image;
+    }
     return ClipOval(
       child: Material(
         color: Colors.transparent,
-        child: Ink.image(
-          image: NetworkImage(user.image!),
-          width: 128,
-          height: 128,
-          fit: BoxFit.cover,
-          child: InkWell(
-            onTap: () {},
-          ),
+        child: InkWell(
+          onTap: () {
+            _myShowBottomSheet(context);
+          },
+          child: imageUrl == urlLogo
+              ? Image.asset(
+                  imageUrl,
+                  width: size,
+                  height: size,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      Icon(Icons.image_rounded),
+                )
+              : Image.network(
+                  imageUrl,
+                  width: size,
+                  height: size,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(child: CircularProgressIndicator());
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return ClipOval(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: Ink.image(
+                          image: FileImage(File(imageUrl!)),
+                          width: size,
+                          height: size,
+                          fit: BoxFit.cover,
+                          child: InkWell(
+                            onTap: () {
+                              _myShowBottomSheet(context);
+                            },
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
         ),
       ),
     );
@@ -196,7 +262,7 @@ class _EditUserWidgetState extends State<EditUserWidget> {
             // width: 300,
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: greyColor.withOpacity(0.2),
+              color: greyColor.withOpacity(0.1),
               borderRadius: BorderRadius.all(
                 Radius.circular(26),
               ),
@@ -417,5 +483,76 @@ class _EditUserWidgetState extends State<EditUserWidget> {
         ),
       ),
     );
+  }
+
+  Future<void> _myShowBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      context: context,
+      builder: (BuildContext contextSheet) {
+        return StatefulBuilder(
+          builder: (BuildContext contextSheet, StateSetter setState) {
+            return Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: whiteColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      _pickImageFromGallery();
+                    },
+                    child: Text(
+                      "Chọn ảnh từ thư viện",
+                      style: label,
+                    ),
+                  ),
+                  Divider(),
+                  TextButton(
+                    onPressed: () {
+                      _pickImageFromCamera();
+                    },
+                    child: Text(
+                      "Chụp ảnh",
+                      style: label,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // IMAGE
+  Future _pickImageFromGallery() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+
+    if (returnedImage == null) return;
+    setState(() {
+      _selectedImage = returnedImage.path;
+    });
+    updatePicture();
+    print(_selectedImage);
+  }
+
+  Future _pickImageFromCamera() async {
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+
+    if (returnedImage == null) return;
+    setState(() {
+      _selectedImage = returnedImage.path;
+    });
+    updatePicture();
+    print(_selectedImage);
   }
 }

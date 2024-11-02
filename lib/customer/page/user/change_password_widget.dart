@@ -87,7 +87,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
                   // width: 300,
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: greyColor.withOpacity(0.2),
+                    color: greyColor.withOpacity(0.1),
                     borderRadius: BorderRadius.all(
                       Radius.circular(26),
                     ),
