@@ -22,6 +22,8 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
+  final TextEditingController _searchingcontroller = TextEditingController();
+
   List<Product>? list = [];
   List<int> selectedCategoryIDs = [];
   List<Product> filteredProducts = [];
@@ -97,17 +99,25 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: whiteColor,
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 60, 20, 10),
+        padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
         child: SingleChildScrollView(
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(
+                  height: 10,
+                ),
                 Row(
                   children: [
                     Expanded(
@@ -185,6 +195,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                               filteredProducts[index], context);
                         },
                       ),
+                SizedBox(
+                  height: 80,
+                ),
               ],
             ),
           ),
@@ -432,13 +445,14 @@ class _HomeWidgetState extends State<HomeWidget> {
       height: 50,
       decoration: const BoxDecoration(),
       child: TextField(
+        controller: _searchingcontroller,
         onChanged: (text) {
           setState(() {
             _query = text;
             searching(_query);
           });
         },
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           labelText: "Tìm kiếm...",
           labelStyle: TextStyle(color: blackColor),
           border: OutlineInputBorder(
@@ -460,6 +474,17 @@ class _HomeWidgetState extends State<HomeWidget> {
             borderSide: BorderSide(color: blackColor, width: 2),
           ),
           prefixIcon: Icon(Icons.search_rounded),
+          suffixIcon: _query != ''
+              ? IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _searchingcontroller.clear();
+                      _query = '';
+                      searching(_query);
+                    });
+                  },
+                  icon: const Icon(Icons.cancel))
+              : null,
         ),
         cursorColor: blackColor,
       ),

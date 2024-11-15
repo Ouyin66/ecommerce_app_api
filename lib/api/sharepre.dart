@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:ecommerce_app_api/api/api.dart';
+
 import '../model/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,4 +35,32 @@ Future<User> getUser() async {
   SharedPreferences pref = await SharedPreferences.getInstance();
   String strUser = pref.getString('user')!;
   return User.fromJson(jsonDecode(strUser));
+}
+
+Future<bool> updateUser(int userId) async {
+  try {
+    var response = await APIUser().getUser(userId);
+
+    if (response?.user != null) {
+      if (await saveUser(response!.user!)) {
+        if (response.successMessage != null) {
+          print("Cập nhật thành công");
+          return true;
+        } else {
+          print("Cập nhật thất bại");
+          return false;
+        }
+      } else {
+        print("Không saveUser được");
+        return false;
+      }
+    } else {
+      print("Không lấy được user");
+      return false;
+    }
+  } catch (e) {
+    print("Lưu thất bại");
+    print(e);
+    return false;
+  }
 }

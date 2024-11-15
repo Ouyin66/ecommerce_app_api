@@ -1,8 +1,35 @@
+import 'package:ecommerce_app_api/api/apilocation.dart';
 import 'package:ecommerce_app_api/model/cart.dart';
+import 'package:ecommerce_app_api/model/location.dart';
+import 'package:ecommerce_app_api/model/promotion.dart';
 import 'package:flutter/material.dart';
 
 class SelectedCart extends ChangeNotifier {
   List<Cart> lst = [];
+  Location? selectedLocation;
+  Promotion? voucher;
+
+  void getVoucher(Promotion promo) {
+    voucher = promo;
+    notifyListeners();
+  }
+
+  void selectAddress(Location location) {
+    selectedLocation = location;
+    print(selectedLocation!.address);
+
+    notifyListeners();
+  }
+
+  Future<void> getDefaultAddress(int locationId) async {
+    var location = await APILocation().getLocation(locationId);
+
+    if (location != null) {
+      selectedLocation = location;
+    }
+
+    notifyListeners();
+  }
 
   bool selected(Cart cart) {
     return lst.any((c) => c.id == cart.id);
@@ -48,5 +75,11 @@ class SelectedCart extends ChangeNotifier {
 
   void MakeNull() {
     lst = [];
+    selectedLocation = null;
+    voucher = null;
+  }
+
+  void ClearAddress() {
+    selectedLocation = null;
   }
 }

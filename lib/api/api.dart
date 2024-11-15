@@ -36,10 +36,11 @@ class APIUser extends APIRepository {
 
   // Register method
   Future<MessageResponse?> register(
-      String name, String email, String password) async {
+      String name, String email, String phone, String password) async {
     try {
       Uri uri = Uri.parse("$baseurl/User/Register").replace(queryParameters: {
         'email': email,
+        'phone': phone,
         'password': password,
         'name': name,
       });
@@ -154,6 +155,30 @@ class APIUser extends APIRepository {
             user: User.fromJson(data['user']), successMessage: data['message']);
       } else if (response.statusCode == 404) {
         return MessageResponse(errorMessage: "Người dùng không tồn tại");
+      } else {
+        return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
+      }
+    } catch (e) {
+      print("Lỗi: $e với baseurl: $baseurl");
+      return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
+    }
+  }
+
+  Future<MessageResponse?> getUser(int userId) async {
+    try {
+      Uri uri = Uri.parse("$baseurl/User/Get").replace(queryParameters: {
+        'id': userId.toString(),
+      });
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return MessageResponse(
+            user: User.fromJson(data['user']),
+            successMessage: "Lấy thành công");
+      } else if (response.statusCode == 404) {
+        return MessageResponse(errorMessageEmail: "Người dùng không tồn tại");
       } else {
         return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
       }

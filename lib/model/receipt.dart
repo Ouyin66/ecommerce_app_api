@@ -1,3 +1,5 @@
+import 'receipt_variant.dart';
+
 class Receipt {
   int? id;
   int? userId;
@@ -5,9 +7,10 @@ class Receipt {
   String? phone;
   String? coupon;
   int? paymentMethod;
-  int? state;
+  int? interest;
   double? total;
   String? dateCreate;
+  List<ReceiptVariant> receiptVariants;
 
   Receipt({
     this.id,
@@ -16,10 +19,14 @@ class Receipt {
     this.phone,
     this.coupon,
     this.paymentMethod,
-    this.state,
+    this.interest,
     this.total,
     this.dateCreate,
+    required this.receiptVariants,
   });
+
+  double get totalReceipt =>
+      receiptVariants.fold(0, (sum, item) => sum + total!);
 
   factory Receipt.fromJson(Map<String, dynamic> json) {
     return Receipt(
@@ -29,9 +36,10 @@ class Receipt {
       phone: json["phone"] ?? '',
       coupon: json["coupon"] ?? '',
       paymentMethod: json["paymentMethod"] ?? 0,
-      state: json["state"] ?? 0,
+      interest: json["interest"] ?? 0,
       total: json["total"] ?? 0.0,
       dateCreate: json["dateCreate"] ?? '',
+      receiptVariants: json["ReceiptVariants"] ?? [],
     );
   }
 
@@ -43,7 +51,7 @@ class Receipt {
       "phone": phone,
       "coupon": coupon,
       "paymentMethod": paymentMethod,
-      "state": state,
+      "state": interest,
       "total": total,
       "dateCreate": dateCreate,
     };

@@ -4,6 +4,7 @@ class Location {
   String? name;
   String? address;
   String? dateCreate;
+  bool? isDefault;
 
   Location({
     this.id,
@@ -11,6 +12,7 @@ class Location {
     this.name,
     this.address,
     this.dateCreate,
+    this.isDefault = false,
   });
 
   // static Gender userEmpty() {

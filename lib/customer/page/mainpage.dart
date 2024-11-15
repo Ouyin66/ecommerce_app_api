@@ -84,7 +84,8 @@ class _MainPageState extends State<MainPage> {
                       _buildNavItem(Icons.home_outlined, Icons.home_rounded, 0),
                       _buildNavItem(
                           Icons.favorite_border_outlined, Icons.favorite, 1),
-                      _buildNavItem(Icons.timer_outlined, Icons.timer, 2),
+                      _buildNavItem(
+                          Icons.receipt_long_rounded, Icons.receipt_long, 2),
                       _buildNavItem(Icons.notifications_none_outlined,
                           Icons.notifications, 3),
                       _buildNavItem(

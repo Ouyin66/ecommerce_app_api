@@ -64,6 +64,8 @@ class _LoginWidgetState extends State<LoginWidget> with RouteAware {
   autoLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getString('user') != null) {
+      var user = await getUser();
+      await updateUser(user.id!);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => const MainPage()));
     }

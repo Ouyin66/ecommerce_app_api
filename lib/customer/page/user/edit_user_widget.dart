@@ -54,10 +54,10 @@ class _EditUserWidgetState extends State<EditUserWidget> {
 
   void updatePicture() async {
     if (_selectedImage != null) {
-      user?.image = _selectedImage;
+      user.image = _selectedImage;
     }
 
-    var response = await APIUser().updateInformation(user!);
+    var response = await APIUser().updateInformation(user);
     if (response?.user != null) {
       if (await saveUser(response!.user!)) {
         if (response.successMessage != null) {
@@ -171,10 +171,10 @@ class _EditUserWidgetState extends State<EditUserWidget> {
 
   Widget buildImage(double size) {
     final imageUrl;
-    if (user?.image == null || user?.image == '') {
+    if (user.image == null || user.image == '') {
       imageUrl = urlLogo;
     } else {
-      imageUrl = user?.image;
+      imageUrl = user.image;
     }
     return ClipOval(
       child: Material(
@@ -362,7 +362,7 @@ class _EditUserWidgetState extends State<EditUserWidget> {
               hintStyle: GoogleFonts.barlow(
                 fontSize: 16,
                 color: greyColor,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w500,
                 fontStyle: FontStyle.italic,
               ),
               errorStyle: error,

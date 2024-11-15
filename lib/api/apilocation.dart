@@ -47,6 +47,9 @@ class APILocation extends APIRepository {
         Location location = Location.fromJson(data['location']);
 
         return location;
+      } else if (response.statusCode == 404) {
+        print("Không tìm thấy địa điểm");
+        return null;
       } else {
         print("Lỗi khi lấy địa điểm: ${response.statusCode}");
         return null;
@@ -70,7 +73,9 @@ class APILocation extends APIRepository {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        return MessageResponse(successMessage: data['message']);
+        return MessageResponse(
+            location: Location.fromJson(data['location']),
+            successMessage: data['message']);
       } else {
         final errorData = jsonDecode(response.body);
         if (errorData.containsKey('errorName') &&
@@ -124,7 +129,7 @@ class APILocation extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> deleteCart(int id) async {
+  Future<MessageResponse?> deleteLocation(int id) async {
     try {
       Uri uri = Uri.parse("$baseurl/Location/Delete").replace(queryParameters: {
         'id': id.toString(),
@@ -138,6 +143,9 @@ class APILocation extends APIRepository {
         return MessageResponse(
             location: Location.fromJson(data['location']),
             successMessage: data['message']);
+      } else if (response.statusCode == 404) {
+        final errorData = jsonDecode(response.body);
+        return MessageResponse(errorMessage: errorData['message']);
       } else {
         final errorData = jsonDecode(response.body);
         return MessageResponse(errorMessage: errorData['message']);
@@ -145,6 +153,30 @@ class APILocation extends APIRepository {
     } catch (e) {
       print("Lỗi: $e");
       return null;
+    }
+  }
+
+  Future<MessageResponse?> setDefaultLocation(int locationId) async {
+    try {
+      Uri uri = Uri.parse("$baseurl/Location/SetDefaultLocation")
+          .replace(queryParameters: {
+        'locationId': locationId.toString(),
+      });
+
+      final response = await http.put(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return MessageResponse(successMessage: data['message']);
+      } else if (response.statusCode == 404) {
+        final errorData = jsonDecode(response.body);
+        return MessageResponse(errorMessage: errorData['message'] ?? '');
+      } else {
+        return MessageResponse(errorMessage: "Đã xảy ra lỗi không xác định");
+      }
+    } catch (e) {
+      print("Lỗi: $e với baseurl: $baseurl");
+      return MessageResponse(errorMessage: "Không thể kết nối đến máy chủ.");
     }
   }
 }

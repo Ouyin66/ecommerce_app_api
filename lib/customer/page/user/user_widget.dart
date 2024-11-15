@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:ecommerce_app_api/api/api.dart';
 import 'package:ecommerce_app_api/customer/page/user/change_password_widget.dart';
 import 'package:ecommerce_app_api/customer/page/user/location_widget.dart';
@@ -71,6 +70,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
         print(
             "${response.user!.id}, ${response.user!.name}, ${response.user!.phone}, ${response.user!.gender}");
         getDataUser();
+        _selectedImage = '';
       } else {
         print("Không saveUser được");
       }
@@ -337,7 +337,10 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
                 buildButton(
                   Icons.location_on_outlined,
                   "Địa chỉ giao hàng",
-                  widget: LocationWidget(user: user!),
+                  widget: LocationWidget(
+                    user: user!,
+                    selectedWidget: false,
+                  ),
                 ),
                 Divider(
                   height: 30,

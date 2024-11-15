@@ -3,6 +3,7 @@ import 'package:ecommerce_app_api/api/apicolor.dart';
 import 'package:ecommerce_app_api/api/apiproduct.dart';
 import 'package:ecommerce_app_api/api/apisize.dart';
 import 'package:ecommerce_app_api/api/apivariant.dart';
+import 'package:ecommerce_app_api/customer/page/order/order_widget.dart';
 import 'package:ecommerce_app_api/model/variant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -148,15 +149,15 @@ class _CartWidgetState extends State<CartWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                urlLogo2,
-                fit: BoxFit.cover,
-                height: 50,
-              ),
+              Text("Giỏ hàng", style: head),
               SizedBox(
                 width: 10,
               ),
-              Text("GIỎ HÀNG", style: subhead),
+              Image.asset(
+                urlLogo3,
+                fit: BoxFit.cover,
+                height: 50,
+              ),
             ],
           ),
         ),
@@ -165,12 +166,12 @@ class _CartWidgetState extends State<CartWidget> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 90),
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
               child: SingleChildScrollView(
                 child: Center(
                   child: Column(
                     children: [
-                      list == null
+                      list == null || list!.isEmpty
                           ? Center(
                               child: Text(
                                 "Chưa có sản phẩm nào trong giỏ",
@@ -186,6 +187,9 @@ class _CartWidgetState extends State<CartWidget> {
                                 return _buildCart(item!, context);
                               },
                             ),
+                      SizedBox(
+                        height: 90,
+                      ),
                     ],
                   ),
                 ),
@@ -272,7 +276,23 @@ class _CartWidgetState extends State<CartWidget> {
                       Expanded(
                         flex: 4,
                         child: FilledButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            if (selectedCart.lst.isEmpty) {
+                              showToast(context, "Hãy chọn sản phẩm muốn đặt",
+                                  isError: true);
+                            } else {
+                              selectedCart.ClearAddress();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OrderWidget(
+                                    items: selectedCart.lst,
+                                    user: user,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                           style: FilledButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -280,7 +300,7 @@ class _CartWidgetState extends State<CartWidget> {
                             backgroundColor: blackColor,
                           ),
                           child: Text(
-                            "Thanh toán",
+                            "Đặt hàng",
                             style: subhead,
                             textAlign: TextAlign.center,
                           ),
@@ -341,6 +361,8 @@ class _CartWidgetState extends State<CartWidget> {
                             height: 100,
                             width: 100,
                             decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: greyColor.withOpacity(0.3)),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(16)),
                               image: DecorationImage(

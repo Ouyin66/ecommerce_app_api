@@ -1,3 +1,5 @@
+import 'package:ecommerce_app_api/model/promotion.dart';
+
 import 'location.dart';
 import 'product.dart';
 import 'cart.dart';
@@ -10,6 +12,7 @@ class MessageResponse {
   final Product? product;
   final Cart? cart;
   final Location? location;
+  final Promotion? promotion;
   final String? errorMessage;
   final String? anotherError;
   final String? successMessage;
@@ -22,6 +25,7 @@ class MessageResponse {
       this.product,
       this.cart,
       this.location,
+      this.promotion,
       this.successMessage,
       this.errorMessage,
       this.anotherError,

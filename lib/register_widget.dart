@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'api/api.dart';
 import 'config/const.dart';
@@ -17,6 +18,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repasswordController = TextEditingController();
   bool _acceptTerms = false;
@@ -29,8 +31,11 @@ class _RegisterWidgetState extends State<RegisterWidget> {
 
   void register() async {
     try {
-      var response = await APIUser().register(_nameController.text,
-          _emailController.text, _passwordController.text);
+      var response = await APIUser().register(
+          _nameController.text,
+          _emailController.text,
+          _phoneController.text,
+          _passwordController.text);
 
       // Kiểm tra phản hồi từ API
       setState(() {
@@ -120,6 +125,22 @@ class _RegisterWidgetState extends State<RegisterWidget> {
                           }
                           return errorEmail;
                         },
+                      ),
+                      const SizedBox(height: 15),
+                      InputField(
+                        "Số điện thoại",
+                        _phoneController,
+                        'Số điện thoại...',
+                        Icons.phone,
+                        (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Vui lòng nhập số điện thoại';
+                          } else if (value.length < 10) {
+                            return 'Số điện thoại không hợp lệ';
+                          }
+                          return null;
+                        },
+                        isPhone: true,
                       ),
                       const SizedBox(height: 15),
                       InputField(
@@ -346,7 +367,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
 
   Widget InputField(String label, TextEditingController controller,
       String labelText, IconData icon, String? Function(String?) errorMess,
-      {bool isPassword = false, bool isHidden = false}) {
+      {bool isPhone = false, bool isPassword = false, bool isHidden = false}) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,6 +381,13 @@ class _RegisterWidgetState extends State<RegisterWidget> {
         ),
         TextFormField(
           controller: controller,
+          keyboardType: isPhone ? TextInputType.number : null,
+          inputFormatters: isPhone
+              ? [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ]
+              : [],
           style: const TextStyle(fontSize: 16),
           obscureText: isPassword ? isHidden : false,
           decoration: InputDecoration(

@@ -5,6 +5,7 @@ class User {
   String? name;
   String? phone;
   String? image;
+  int? defaultLocationID;
   int? gender;
   int? state;
   int? role;
@@ -18,6 +19,7 @@ class User {
     this.name,
     this.phone,
     this.image,
+    this.defaultLocationID,
     this.gender,
     this.state,
     this.role,
@@ -33,6 +35,7 @@ class User {
       name: '',
       phone: '',
       image: '',
+      defaultLocationID: null,
       gender: null,
       state: null,
       role: null,
@@ -49,6 +52,7 @@ class User {
       name: json["name"] ?? '',
       image: json["image"] == null || json["image"] == '' ? "" : json["image"],
       phone: json["phone"] ?? '',
+      defaultLocationID: json["defaultLocationId"] ?? 0,
       gender: json["gender"] ?? 0,
       state: json["state"] ?? 0,
       role: json["role"] ?? 0,
@@ -65,6 +69,7 @@ class User {
       "name": name,
       "phone": phone,
       "image": image,
+      "defaultLocationId": defaultLocationID,
       "gender": gender,
       "state": state,
       "role": role,

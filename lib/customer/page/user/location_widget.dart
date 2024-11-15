@@ -1,15 +1,20 @@
 import 'package:ecommerce_app_api/api/apilocation.dart';
+import 'package:ecommerce_app_api/api/sharepre.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../config/const.dart';
 import '../../../model/location.dart';
+import '../../../model/selectedcart.dart';
 import '../../../model/user.dart';
+import 'package:provider/provider.dart';
 
 class LocationWidget extends StatefulWidget {
   final User user;
-  const LocationWidget({super.key, required this.user});
+  final bool selectedWidget;
+  const LocationWidget(
+      {super.key, required this.user, required this.selectedWidget});
 
   @override
   State<LocationWidget> createState() => _LocationWidgetState();
@@ -20,19 +25,20 @@ class _LocationWidgetState extends State<LocationWidget> {
   final TextEditingController _searchingcontroller = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  User? user;
   String? errorMessage;
   String? anotherError;
   bool _isEdit = false;
+  bool _isDefault = false;
 
   int? _idLocation;
 
-  int? userId;
   List<Location>? list = [];
   List<Location>? searchingList = [];
   String _query = '';
 
   void getList() async {
-    list = await APILocation().getLocationByUser(userId!);
+    list = await APILocation().getLocationByUser(user!.id!);
     if (list != null) {
       searchingList = List.from(list!);
       print("Lấy được danh sách");
@@ -57,7 +63,7 @@ class _LocationWidgetState extends State<LocationWidget> {
 
   void add() async {
     Location location = Location(
-        userId: userId,
+        userId: user!.id,
         name: _nameController.text,
         address: _addressController.text);
 
@@ -70,6 +76,10 @@ class _LocationWidgetState extends State<LocationWidget> {
       if (response?.successMessage != null) {
         _nameController.clear();
         _addressController.clear();
+        if (_isDefault && response?.location != null) {
+          setDefault(response!.location!.id!);
+        }
+        _isDefault = false;
         getList();
         showToast(context, response!.successMessage!);
       } else if (response?.errorMessage != null) {
@@ -92,7 +102,9 @@ class _LocationWidgetState extends State<LocationWidget> {
 
       if (response?.successMessage != null) {
         getList();
-        showToast(context, response!.successMessage!);
+        if (_isEdit) {
+          showToast(context, response!.successMessage!);
+        }
       } else if (response?.errorMessage != null) {
         errorMessage = response!.errorMessage;
       } else if (response?.anotherError != null) {
@@ -104,28 +116,54 @@ class _LocationWidgetState extends State<LocationWidget> {
   }
 
   void delete(int id) async {
-    var response = await APILocation().deleteCart(id);
-
-    if (response?.successMessage != null) {
-      getList();
-      Navigator.pop(context);
-      // _nameController.clear();
-      // _addressController.clear();
-      if (_idLocation != null) {
-        _isEdit = true;
+    var response = await APILocation().deleteLocation(id);
+    setState(() {
+      if (response?.successMessage != null) {
+        getList();
+        Navigator.pop(context);
+        // _nameController.clear();
+        // _addressController.clear();
+        if (_idLocation != null) {
+          _isEdit = true;
+        }
+        showToast(context, response!.successMessage!);
+      } else if (response?.errorMessage != null) {
+        Navigator.pop(context);
+        showToast(context, response!.errorMessage!, isError: true);
       }
-      showToast(context, response!.successMessage!);
-    } else if (response?.errorMessage != null) {
-      showToast(context, response!.errorMessage!, isError: true);
-    }
+    });
+  }
 
+  void setDefault(int id) async {
+    var response = await APILocation().setDefaultLocation(id);
+
+    setState(() {
+      if (response?.successMessage != null) {
+        updateInformation(widget.user.id!);
+        getList();
+        if (_isEdit) {
+          Navigator.pop(context);
+          showToast(context, response!.successMessage!);
+        }
+      } else if (response?.errorMessage != null) {
+        errorMessage = response!.errorMessage;
+      }
+    });
+  }
+
+  void updateInformation(int id) async {
+    if (await updateUser(id)) {
+      user = await getUser();
+    } else {
+      print("Update thất bại");
+    }
     setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
-    userId = widget.user.id;
+    user = widget.user;
     getList();
   }
 
@@ -155,7 +193,7 @@ class _LocationWidgetState extends State<LocationWidget> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 90),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
         child: SingleChildScrollView(
           child: Center(
             child: Column(
@@ -165,6 +203,16 @@ class _LocationWidgetState extends State<LocationWidget> {
                   height: 15,
                 ),
                 _buildAddBox(),
+                SizedBox(
+                  height: 15,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Danh sách địa chỉ",
+                    style: subhead,
+                  ),
+                ),
                 SizedBox(
                   height: 15,
                 ),
@@ -193,16 +241,28 @@ class _LocationWidgetState extends State<LocationWidget> {
   }
 
   Widget _buildLocation(Location location, BuildContext context) {
+    final selectedCart = Provider.of<SelectedCart>(context);
+
     return Column(
       children: [
         InkWell(
-          onTap: () {},
+          onTap: () {
+            selectedCart.selectAddress(location);
+          },
           child: Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: whiteColor,
               borderRadius: const BorderRadius.all(Radius.circular(16)),
-              border: Border.all(width: 0.1, color: greyColor),
+              border: Border.all(
+                  width: selectedCart.selectedLocation?.id == location.id &&
+                          widget.selectedWidget == true
+                      ? 1
+                      : 0.1,
+                  color: selectedCart.selectedLocation?.id == location.id &&
+                          widget.selectedWidget == true
+                      ? branchColor
+                      : greyColor),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -213,15 +273,49 @@ class _LocationWidgetState extends State<LocationWidget> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        location.name!,
-                        style: label,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          user?.defaultLocationID == location.id
+                              ? Expanded(
+                                  flex: 1,
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color: branchColor),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      "Mặc định",
+                                      style: GoogleFonts.barlow(
+                                        fontSize: 16,
+                                        color: branchColor,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(),
+                          SizedBox(
+                            width:
+                                user?.defaultLocationID == location.id ? 5 : 0,
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              location.name!,
+                              style: label,
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(
                         height: 5,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(
                             Icons.location_on,
@@ -238,9 +332,9 @@ class _LocationWidgetState extends State<LocationWidget> {
                                 fontWeight: FontWeight.bold,
                                 fontStyle: FontStyle.italic,
                               ),
-                              maxLines: 1,
+                              // maxLines: 1,
                               softWrap: true,
-                              overflow: TextOverflow.ellipsis,
+                              // overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -255,6 +349,11 @@ class _LocationWidgetState extends State<LocationWidget> {
                       _idLocation = location.id;
                       _nameController.text = location.name!;
                       _addressController.text = location.address!;
+                      if (_idLocation == user?.defaultLocationID) {
+                        _isDefault = true;
+                      } else {
+                        _isDefault = false;
+                      }
                     });
                   },
                   icon: Icon(
@@ -398,6 +497,13 @@ class _LocationWidgetState extends State<LocationWidget> {
                 SizedBox(
                   height: 10,
                 ),
+                SizedBox(
+                  width: double.maxFinite,
+                  child: _buildDefaultSwitch(),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
               ],
             ),
           ),
@@ -407,6 +513,58 @@ class _LocationWidgetState extends State<LocationWidget> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDefaultSwitch() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 6,
+          child: Text(
+            "Đặt làm địa chỉ mặc định",
+            style: const TextStyle(
+              color: blackColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        Spacer(),
+        Expanded(
+          flex: 2,
+          child: Switch(
+              activeColor: branchColor,
+              value: _idLocation == user?.defaultLocationID ? true : _isDefault,
+              onChanged: (value) {
+                setState(() {
+                  if (value == true) {
+                    if (_isEdit && _idLocation != null) {
+                      showDeleteDialog(context, _idLocation!,
+                          isSetDefault: true);
+                      // setDefault(_idLocation!);
+                    } else {
+                      _isDefault = value;
+                    }
+                  } else {
+                    if (!_isEdit && _idLocation == null) {
+                      _isDefault = value;
+                    } else {
+                      _isDefault = !value;
+                      showToast(context, "Hãy thiết lập địa chỉ mặc định khác",
+                          isError: true);
+                    }
+                  }
+                  // if (_isEdit && _idLocation != null) {
+                  //   showDeleteDialog(context, _idLocation!, isSetDefault: true);
+                  // } else {
+                  //   _isDefault =
+                  // }
+                });
+              }),
+        ),
+      ],
     );
   }
 
@@ -461,6 +619,7 @@ class _LocationWidgetState extends State<LocationWidget> {
                       _idLocation = null;
                       _nameController.clear();
                       _addressController.clear();
+                      _isDefault = false;
                     });
                   },
                   child: Padding(
@@ -515,7 +674,8 @@ class _LocationWidgetState extends State<LocationWidget> {
     );
   }
 
-  void showDeleteDialog(BuildContext context, int id) {
+  void showDeleteDialog(BuildContext context, int id,
+      {bool isSetDefault = false}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -525,7 +685,9 @@ class _LocationWidgetState extends State<LocationWidget> {
             borderRadius: BorderRadius.all(Radius.circular(24)),
           ),
           title: Text(
-            "Bạn có chắc muốn xóa địa chỉ giao hàng này?",
+            isSetDefault
+                ? "Bạn có muốn đặt địa chỉ giao hàng mặc định là địa chỉ này không? "
+                : "Bạn có chắc muốn xóa địa chỉ giao hàng này?",
             style: infoLabel,
           ),
           actions: [
@@ -546,17 +708,20 @@ class _LocationWidgetState extends State<LocationWidget> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: branchColor,
+                backgroundColor: isSetDefault ? Colors.green : branchColor,
                 foregroundColor: whiteColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               onPressed: () {
-                print(_isEdit);
-                delete(id);
+                if (isSetDefault) {
+                  setDefault(id);
+                } else {
+                  delete(id);
+                }
               },
-              child: Text("Xóa", style: subhead),
+              child: Text(isSetDefault ? "Đồng ý" : "Xóa", style: subhead),
             ),
           ],
         );
