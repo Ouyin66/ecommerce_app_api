@@ -3,8 +3,10 @@ import 'package:ecommerce_app_api/model/selectedcart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'login_widget.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
-void main() {
+void main() async {
+  await _setup();
   runApp(
     MultiProvider(
       providers: [
@@ -13,6 +15,11 @@ void main() {
       child: MainApp(),
     ),
   );
+}
+
+Future<void> _setup() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Stripe.publishableKey = stripePublishableKey;
 }
 
 class MainApp extends StatelessWidget {

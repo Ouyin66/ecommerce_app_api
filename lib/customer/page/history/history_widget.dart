@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../config/const.dart';
+
 class HistoryWidget extends StatefulWidget {
   const HistoryWidget({super.key});
 
@@ -10,6 +12,14 @@ class HistoryWidget extends StatefulWidget {
 class _HistoryWidgetState extends State<HistoryWidget> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: whiteColor,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
+        child: Column(
+          children: [],
+        ),
+      ),
+    );
   }
 }

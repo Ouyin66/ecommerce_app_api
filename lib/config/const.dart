@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+// STRIPE API
+const String stripePublishableKey =
+    "pk_test_51QLP4qD6t5ZfQvhu1ZDjYQTG3kMYRwVTpKX4akK54LkcCqAYD9zVeGFrTfXnhBBL2MuDYOg6dpysv9DkEDdIyojM00anGKPXCR";
+const String stripeSecretKey =
+    "sk_test_51QLP4qD6t5ZfQvhuAerVpSXFLZwMIDJVfXdyV67Wtqk0kfVwj440kLCr14G8fXlIfpCz66Uf8v8LK6onaX1OkOId009acsmAFn";
+
 // COLOR
 const branchColor = Color(0xFFED1B24);
 const whiteColor = Color(0xFFFFFFFF);
@@ -9,10 +15,10 @@ const blackColor = Color(0xFF1D1D1D);
 const greyColor = Color(0xFF959595);
 
 // IMAGE
-
 const urlLogo = 'assets/images/UNIQLO.png';
 const urlLogo2 = 'assets/images/UNIQLO2.png';
 const urlLogo3 = 'assets/images/UNIQLO3.png';
+const urlSuccess = 'assets/images/Success.png';
 const urlGoogleLogo = 'assets/images/Google_Logo.png';
 const urlFacebookLogo = 'assets/images/Facebook_Logo.png';
 const urlForgetPassword = 'assets/images/Forget_Password.png';
