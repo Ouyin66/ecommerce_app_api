@@ -7,7 +7,7 @@ class Receipt {
   int? userId;
   String? address;
   String? phone;
-  int? coupon;
+  double? discount;
   String? paymentId;
   bool? interest;
   double? total;
@@ -20,7 +20,7 @@ class Receipt {
     this.userId,
     this.address,
     this.phone,
-    this.coupon,
+    this.discount,
     this.paymentId,
     this.interest,
     this.total,
@@ -40,7 +40,7 @@ class Receipt {
       userId: json["userId"] ?? 0,
       address: json["address"] ?? '',
       phone: json["phone"] ?? '',
-      coupon: json["coupon"] ?? 0,
+      discount: json["discount"] ?? 0.0,
       paymentId: json["paymentId"] ?? '',
       interest: json["interest"] ?? false,
       total: json["total"] ?? 0.0,
@@ -61,7 +61,7 @@ class Receipt {
       "userId": userId,
       "address": address,
       "phone": phone,
-      "coupon": coupon,
+      "discount": discount,
       "paymentId": paymentId,
       "interest": interest,
       "total": total,

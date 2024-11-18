@@ -44,7 +44,7 @@ class APIReceipt extends APIRepository {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
-        // Parse danh sách sản phẩm
+        // Parse danh sách hóa đơn
         List<Receipt> receipts = (data['receipts'] as List)
             .map((receipts) => Receipt.fromJson(receipts))
             .toList();
@@ -79,6 +79,28 @@ class APIReceipt extends APIRepository {
     } else {
       print('Failed to create receipt: ${response.body}');
       print(jsonEncode(receipt.toJson()));
+      return null;
+    }
+  }
+
+  Future<MessageResponse?> updateInterest(
+      int receiptId, bool isInterest) async {
+    Uri uri =
+        Uri.parse("$baseurl/Receipt/IsInterest").replace(queryParameters: {
+      'receiptId': receiptId.toString(),
+      'isInterest': isInterest.toString(),
+    });
+
+    final response = await http.put(uri);
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return MessageResponse(successMessage: data['message']);
+    } else if (response.statusCode == 404) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return MessageResponse(errorMessage: data['message']);
+    } else {
+      print('Cập nhật thất bại: ${response.body}');
       return null;
     }
   }

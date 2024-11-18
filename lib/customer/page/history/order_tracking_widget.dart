@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../config/const.dart';
+import '../../../model/receipt.dart';
 
 class OrderTrackingWidget extends StatefulWidget {
-  const OrderTrackingWidget({super.key});
+  final Receipt receipt;
+  const OrderTrackingWidget({super.key, required this.receipt});
 
   @override
   State<OrderTrackingWidget> createState() => _OrderTrackingWidgetState();

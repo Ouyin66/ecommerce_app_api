@@ -75,7 +75,7 @@ class _OrderWidgetState extends State<OrderWidget> {
       userId: user.id,
       address: _addressController.text,
       phone: user.phone,
-      coupon: voucher?.id ?? null,
+      discount: discount,
       paymentId: null,
       interest: false,
       total: total,
@@ -724,9 +724,6 @@ class _OrderWidgetState extends State<OrderWidget> {
                             ),
                           ],
                         ),
-                        SizedBox(
-                          height: 10,
-                        ),
                       ],
                     ),
                   ),
@@ -734,6 +731,9 @@ class _OrderWidgetState extends State<OrderWidget> {
               ),
             ),
           ],
+        ),
+        SizedBox(
+          height: 10,
         ),
         Divider(),
         SizedBox(

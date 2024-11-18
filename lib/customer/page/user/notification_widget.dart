@@ -177,15 +177,15 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         }
 
         if (item.type == 'Receipt') {
-          // var obj = await getReceipt(item.id!);
-          // if (obj != null) {
-          //   Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => ReceiptDetailWidget(receipt: obj),
-          //     ),
-          //   );
-          // }
+          var obj = await getReceipt(item.id!);
+          if (obj != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ReceiptDetailWidget(receipt: obj),
+              ),
+            );
+          }
         }
       },
       child: Column(

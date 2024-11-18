@@ -1,3 +1,5 @@
+import 'package:ecommerce_app_api/model/variant.dart';
+
 class ReceiptVariant {
   int? receiptId;
   int? variantId;
@@ -5,12 +7,13 @@ class ReceiptVariant {
   double? price;
 
   double? total;
-
+  Variant? variant;
   ReceiptVariant({
     this.receiptId,
     this.variantId,
     this.quantity,
     this.price,
+    this.variant,
   }) {
     total = (quantity ?? 0) * (price ?? 0);
   }

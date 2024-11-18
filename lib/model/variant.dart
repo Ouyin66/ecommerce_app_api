@@ -1,4 +1,5 @@
 import 'package:ecommerce_app_api/model/color.dart';
+import 'package:ecommerce_app_api/model/product.dart';
 import 'package:ecommerce_app_api/model/size.dart';
 
 class Variant {
@@ -14,6 +15,7 @@ class Variant {
   double? total;
   MyColor? color;
   MySize? size;
+  Product? product;
 
   Variant({
     this.id,
@@ -24,6 +26,9 @@ class Variant {
     this.picture,
     this.quantity,
     this.dateCreate,
+    this.size,
+    this.color,
+    this.product,
   });
 
   static Variant variantEmpty() {
@@ -51,6 +56,10 @@ class Variant {
           : json["picture"],
       quantity: json["quantity"] ?? 0,
       dateCreate: json["dateCreate"] ?? '',
+      color: json["color"] != null ? MyColor.fromJson(json["color"]) : null,
+      size: json["size"] != null ? MySize.fromJson(json["size"]) : null,
+      product:
+          json["product"] != null ? Product.fromJson(json["product"]) : null,
     );
   }
 

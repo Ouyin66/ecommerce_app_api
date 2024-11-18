@@ -1,4 +1,5 @@
 import 'package:ecommerce_app_api/api/api_receipt.dart';
+import 'package:ecommerce_app_api/customer/page/history/receipt_detail_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
@@ -26,10 +27,10 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   var _query = '';
 
   final List<Map<String, dynamic>> lstState = [
-    {'id': 0, 'label': 'Đã hủy'},
-    {'id': 1, 'label': 'Đang xử lý'},
-    {'id': 2, 'label': 'Đang giao'},
-    {'id': 3, 'label': 'Đã giao'},
+    {'id': 0, 'label': 'Đã hủy', 'color': branchColor},
+    {'id': 1, 'label': 'Đang xử lý', 'color': Colors.deepOrangeAccent},
+    {'id': 2, 'label': 'Đang giao', 'color': Colors.redAccent},
+    {'id': 3, 'label': 'Đã giao', 'color': Colors.green},
   ];
 
   void getDataUser() async {
@@ -121,6 +122,17 @@ class _HistoryWidgetState extends State<HistoryWidget> {
     } else {
       filteredReceipts.sort((a, b) => DateTime.parse(b.dateCreate!)
           .compareTo(DateTime.parse(a.dateCreate!)));
+    }
+
+    setState(() {});
+  }
+
+  void isInterest(int receiptId, bool isInterest) async {
+    var response = await APIReceipt().updateInterest(receiptId, isInterest);
+    if (response?.successMessage != null) {
+      getListReceipt(user.id!);
+    } else {
+      print("Lỗi cập nhật trường Interest cho Receipt ");
     }
 
     setState(() {});
@@ -226,25 +238,22 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   }
 
   Widget _buildReceipt(Receipt item, BuildContext context) {
-    String state = 'Đang xử lý';
-    Color stateColor = Colors.deepOrangeAccent;
-
     DateTime dateTime = DateTime.parse(item.dateCreate!);
-    var formattedDate = DateFormat('HH:mm:ss - dd/MM/yyyy').format(dateTime);
+    var formattedDate = DateFormat('HH:mm - dd/MM/yyyy').format(dateTime);
 
-    if (item.orderStatusHistories!.first.state! == 2) {
-      state = 'Đang giao';
-      stateColor = Colors.redAccent;
-    } else if (item.orderStatusHistories!.first.state! == 3) {
-      state = 'Đã giao';
-      stateColor = Colors.green;
-    } else if (item.orderStatusHistories!.first.state! == 0) {
-      state = 'Đã hủy';
-      stateColor = branchColor;
-    }
+    var state = lstState[item.orderStatusHistories?.first.state! ?? 0];
+    Color stateColor = state['color'];
 
     return InkWell(
-      onTap: () async {},
+      onTap: () async {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ReceiptDetailWidget(
+                    receipt: item,
+                  )),
+        );
+      },
       child: Column(
         children: [
           Container(
@@ -263,30 +272,42 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                     SizedBox(
                       width: 5,
                     ),
-                    Text.rich(
-                      TextSpan(
-                        text: "HD${item.id.toString().padLeft(10, '0')}",
-                        style: GoogleFonts.barlow(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: "  (${state})",
-                            style: GoogleFonts.barlow(
-                              color: stateColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              fontStyle: FontStyle.italic,
-                            ),
-                          ),
-                        ],
+                    Text(
+                      "HD${item.id.toString().padLeft(10, '0')}",
+                      style: GoogleFonts.barlow(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.left,
                     ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
+                      decoration: BoxDecoration(
+                        color: stateColor.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        state['label'],
+                        style: GoogleFonts.barlow(
+                          fontSize: 16,
+                          color: stateColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                     Spacer(),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        if (item.interest!) {
+                          isInterest(item.id!, false);
+                        } else {
+                          isInterest(item.id!, true);
+                        }
+                      },
                       child: Icon(
                         item.interest!
                             ? Icons.notifications_active_rounded
@@ -569,7 +590,8 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   }
 
   Widget _buildFilter(int selectedState, BuildContext context) {
-    var name = lstState[selectedState];
+    var state = lstState[selectedState];
+    Color color = state['color'];
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.start,
@@ -577,8 +599,8 @@ class _HistoryWidgetState extends State<HistoryWidget> {
         Container(
           padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
           decoration: BoxDecoration(
-            color: greyColor,
-            border: Border.all(color: greyColor),
+            color: color.withOpacity(0.3),
+            // border: Border.all(color: greyColor),
             borderRadius: BorderRadius.all(
               Radius.circular(24),
             ),
@@ -588,10 +610,10 @@ class _HistoryWidgetState extends State<HistoryWidget> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                name['label'],
+                state['label'],
                 style: GoogleFonts.barlow(
                   fontSize: 12,
-                  color: whiteColor,
+                  color: color,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -606,7 +628,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                 },
                 child: Icon(
                   Icons.cancel_rounded,
-                  color: whiteColor,
+                  color: color,
                   size: 16,
                 ),
               ),
@@ -628,8 +650,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
         Container(
           padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
           decoration: BoxDecoration(
-            color: blackColor,
-            border: Border.all(color: greyColor),
+            color: branchColor,
             borderRadius: BorderRadius.all(
               Radius.circular(24),
             ),
@@ -664,9 +685,6 @@ class _HistoryWidgetState extends State<HistoryWidget> {
               ),
             ],
           ),
-        ),
-        SizedBox(
-          width: 10,
         ),
       ],
     );
