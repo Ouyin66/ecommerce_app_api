@@ -1,3 +1,5 @@
+import 'package:ecommerce_app_api/model/order_status_history.dart';
+
 import 'receipt_variant.dart';
 
 class Receipt {
@@ -7,10 +9,11 @@ class Receipt {
   String? phone;
   int? coupon;
   String? paymentId;
-  int? interest;
+  bool? interest;
   double? total;
   String? dateCreate;
   List<ReceiptVariant> receiptVariants;
+  List<OrderStatusHistory>? orderStatusHistories;
 
   Receipt({
     this.id,
@@ -23,10 +26,13 @@ class Receipt {
     this.total,
     this.dateCreate,
     required this.receiptVariants,
+    this.orderStatusHistories,
   });
 
   double get totalReceipt =>
       receiptVariants.fold(0, (sum, item) => sum + total!);
+
+  int get totalItem => receiptVariants.length;
 
   factory Receipt.fromJson(Map<String, dynamic> json) {
     return Receipt(
@@ -36,12 +42,16 @@ class Receipt {
       phone: json["phone"] ?? '',
       coupon: json["coupon"] ?? 0,
       paymentId: json["paymentId"] ?? '',
-      interest: json["interest"] ?? 0,
+      interest: json["interest"] ?? false,
       total: json["total"] ?? 0.0,
       dateCreate: json["dateCreate"] ?? '',
       receiptVariants: (json["receiptVariants"] as List<dynamic>? ?? [])
           .map((rv) => ReceiptVariant.fromJson(rv))
           .toList(),
+      orderStatusHistories:
+          (json["orderStatusHistories"] as List<dynamic>? ?? [])
+              .map((osh) => OrderStatusHistory.fromJson(osh))
+              .toList(),
     );
   }
 

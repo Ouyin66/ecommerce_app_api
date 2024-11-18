@@ -1,14 +1,41 @@
 import 'dart:convert';
-import 'package:ecommerce_app_api/model/loginresponse.dart';
+import 'package:ecommerce_app_api/model/message_response.dart';
 import 'package:ecommerce_app_api/model/promotion.dart';
 import 'package:ecommerce_app_api/model/receipt.dart';
 import 'package:http/http.dart' as http;
 import 'package:ecommerce_app_api/api/api.dart';
 
 class APIReceipt extends APIRepository {
-  Future<List<Receipt>?> GetListByUser(int id) async {
+  Future<Receipt?> GetReceipt(int receiptId) async {
     try {
-      Uri uri = Uri.parse("$baseurl/Receipts/ListByUserId");
+      Uri uri = Uri.parse("$baseurl/Receipt/Get").replace(queryParameters: {
+        'receiptId': receiptId.toString(),
+      });
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        Receipt receipt = Receipt.fromJson(data['receipt']);
+
+        return receipt;
+      } else {
+        print("Lỗi khi lấy hóa đơn: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Lỗi: $e");
+      return null;
+    }
+  }
+
+  Future<List<Receipt>?> GetListByUser(int userId) async {
+    try {
+      Uri uri =
+          Uri.parse("$baseurl/Receipt/ListByUserId").replace(queryParameters: {
+        'userId': userId.toString(),
+      });
 
       // Gửi yêu cầu GET đến API
       final response = await http.get(uri);
@@ -34,7 +61,7 @@ class APIReceipt extends APIRepository {
   }
 
   Future<Receipt?> createReceipt(Receipt receipt) async {
-    final url = Uri.parse('$baseurl/Receipts/Insert');
+    final url = Uri.parse('$baseurl/Receipt/Insert');
 
     final response = await http.post(
       url,

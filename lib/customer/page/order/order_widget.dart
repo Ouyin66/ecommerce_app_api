@@ -1,4 +1,4 @@
-import 'package:ecommerce_app_api/api/apipromotion.dart';
+import 'package:ecommerce_app_api/api/api_promotion.dart';
 import 'package:ecommerce_app_api/config/const.dart';
 import 'package:ecommerce_app_api/customer/page/order/voucher_widget.dart';
 import 'package:ecommerce_app_api/customer/page/user/location_widget.dart';
@@ -77,7 +77,7 @@ class _OrderWidgetState extends State<OrderWidget> {
       phone: user.phone,
       coupon: voucher?.id ?? null,
       paymentId: null,
-      interest: 0,
+      interest: false,
       total: total,
       receiptVariants: receiptVariants,
     );

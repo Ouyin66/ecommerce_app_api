@@ -1,4 +1,4 @@
-import 'package:ecommerce_app_api/api/apilocation.dart';
+import 'package:ecommerce_app_api/api/api_location.dart';
 import 'package:ecommerce_app_api/model/cart.dart';
 import 'package:ecommerce_app_api/model/location.dart';
 import 'package:ecommerce_app_api/model/promotion.dart';

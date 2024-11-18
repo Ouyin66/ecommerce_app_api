@@ -1,8 +1,8 @@
-import 'package:ecommerce_app_api/api/apicart.dart';
-import 'package:ecommerce_app_api/api/apicolor.dart';
-import 'package:ecommerce_app_api/api/apiproduct.dart';
-import 'package:ecommerce_app_api/api/apisize.dart';
-import 'package:ecommerce_app_api/api/apivariant.dart';
+import 'package:ecommerce_app_api/api/api_cart.dart';
+import 'package:ecommerce_app_api/api/api_color.dart';
+import 'package:ecommerce_app_api/api/api_product.dart';
+import 'package:ecommerce_app_api/api/api_size.dart';
+import 'package:ecommerce_app_api/api/api_variant.dart';
 import 'package:ecommerce_app_api/customer/page/order/order_widget.dart';
 import 'package:ecommerce_app_api/model/variant.dart';
 import 'package:flutter/material.dart';

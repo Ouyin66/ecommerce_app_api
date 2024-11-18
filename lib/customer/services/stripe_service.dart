@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:ecommerce_app_api/api/apireceipt.dart';
+import 'package:ecommerce_app_api/api/api_receipt.dart';
 import 'package:ecommerce_app_api/model/receipt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';

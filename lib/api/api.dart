@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../model/loginresponse.dart';
+import '../model/message_response.dart';
 import '../model/user.dart';
 
 class APIRepository {

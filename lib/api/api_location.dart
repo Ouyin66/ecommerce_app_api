@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:ecommerce_app_api/api/api.dart';
 
 import '../model/location.dart';
-import '../model/loginresponse.dart';
+import '../model/message_response.dart';
 
 class APILocation extends APIRepository {
   Future<List<Location>?> getLocationByUser(int userId) async {

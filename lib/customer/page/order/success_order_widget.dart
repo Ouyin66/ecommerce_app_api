@@ -121,7 +121,7 @@ class _SuccessWidgetState extends State<SuccessWidget> {
               height: 10,
             ),
             _buildInfo(
-                "Hóa đơn:", "HD${receipt?.id.toString().padLeft(6, '0')}"),
+                "Hóa đơn:", "HD${receipt?.id.toString().padLeft(10, '0')}"),
             SizedBox(
               height: 10,
             ),
@@ -184,4 +184,17 @@ class _SuccessWidgetState extends State<SuccessWidget> {
       ],
     );
   }
+
+  // Container(
+  //       decoration: BoxDecoration(
+  //         gradient: LinearGradient(
+  //           begin: Alignment.topCenter,
+  //           end: Alignment.bottomCenter,
+  //           stops: [
+  //             0.01,
+  //             0.2,
+  //           ],
+  //           colors: [branchColor.withOpacity(0.76), whiteColor],
+  //         ),
+  //       ), ),
 }
