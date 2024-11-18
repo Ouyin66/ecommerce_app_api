@@ -18,6 +18,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'edit_user_widget.dart';
+import 'rating_widget.dart';
 
 class UserWidget extends StatefulWidget {
   const UserWidget({super.key});
@@ -181,12 +182,9 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
                       height: 20,
                     ),
                     builThirdBox(),
-                    // SizedBox(
-                    //   height: 30,
-                    // ),
-                    // _selectedImage != null
-                    //     ? Image.file(_selectedImage!)
-                    //     : Text("Please selected an image"),
+                    SizedBox(
+                      height: 20,
+                    ),
                   ],
                 ),
               ),
@@ -341,6 +339,14 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
                     user: user!,
                     selectedWidget: false,
                   ),
+                ),
+                Divider(
+                  height: 30,
+                ),
+                buildButton(
+                  Icons.recommend_outlined,
+                  "Đánh giá sản phẩm",
+                  widget: RatingWidget(),
                 ),
                 Divider(
                   height: 30,

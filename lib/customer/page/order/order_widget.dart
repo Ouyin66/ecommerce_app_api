@@ -1,7 +1,8 @@
-import 'package:ecommerce_app_api/api/apipromotion.dart';
+import 'package:ecommerce_app_api/api/api_promotion.dart';
 import 'package:ecommerce_app_api/config/const.dart';
 import 'package:ecommerce_app_api/customer/page/order/voucher_widget.dart';
 import 'package:ecommerce_app_api/customer/page/user/location_widget.dart';
+import 'package:ecommerce_app_api/customer/services/stripe_service.dart';
 import 'package:ecommerce_app_api/model/cart.dart';
 import 'package:ecommerce_app_api/model/location.dart';
 import 'package:ecommerce_app_api/model/promotion.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../model/receipt_variant.dart';
 import '../../../model/selectedcart.dart';
 import '../../../model/user.dart';
 import 'package:provider/provider.dart';
@@ -60,15 +62,26 @@ class _OrderWidgetState extends State<OrderWidget> {
     setState(() {});
   }
 
-  // void checkAdress() async {
-  //   final selectedCart = Provider.of<SelectedCart>(context);
+  Receipt createReceipt() {
+    List<ReceiptVariant> receiptVariants = lst.map((cart) {
+      return ReceiptVariant(
+        variantId: cart.variantId ?? 0,
+        quantity: cart.quantity ?? 0,
+        price: cart.price ?? 0.0,
+      );
+    }).toList();
 
-  //   if (selectedCart.selectedLocation != null) {
-  //     _addressController.text = selectedCart.selectedLocation!.address!;
-  //   } else {
-  //     _addressController.text = '';
-  //   }
-  // }
+    return Receipt(
+      userId: user.id,
+      address: _addressController.text,
+      phone: user.phone,
+      coupon: voucher?.id ?? null,
+      paymentId: null,
+      interest: false,
+      total: total,
+      receiptVariants: receiptVariants,
+    );
+  }
 
   @override
   void initState() {
@@ -196,7 +209,17 @@ class _OrderWidgetState extends State<OrderWidget> {
                     SizedBox(width: 10),
                     FilledButton(
                       onPressed: () {
-                        // _myShowBottomSheet(context);
+                        if (_formKey.currentState!.validate()) {
+                          var receipt = createReceipt();
+                          StripeService.instance.makePayment(
+                              user.name!, user.email!, receipt, context);
+                        } else {
+                          if (_formKey.currentState!.validate()) {
+                            var receipt = createReceipt();
+                            StripeService.instance.makePayment(
+                                user.name!, user.email!, receipt, context);
+                          }
+                        }
                       },
                       style: FilledButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -361,47 +384,8 @@ class _OrderWidgetState extends State<OrderWidget> {
   }
 
   Widget _buildVoucher() {
-    // final selectedCart = Provider.of<SelectedCart>(context);
-
     return Column(
       children: [
-        // InkWell(
-        //   onTap: () {
-        //     // Navigator.push(
-        //     //   context,
-        //     //   MaterialPageRoute(
-        //     //     builder: (context) => VoucherWidget(),
-        //     //   ),
-        //     // );
-        //   },
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     crossAxisAlignment: CrossAxisAlignment.center,
-        //     children: [
-        //       Icon(Icons.percent_rounded),
-        //       SizedBox(
-        //         width: 10,
-        //       ),
-        //       Text(
-        //         "Áp dụng khuyến mãi",
-        //         style: GoogleFonts.barlow(
-        //           fontSize: 18,
-        //           color: blackColor,
-        //           fontWeight: FontWeight.w500,
-        //         ),
-        //       ),
-        //       Spacer(),
-        //       Icon(
-        //         Icons.arrow_forward_ios_rounded,
-        //         size: 16,
-        //         color: blackColor,
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        // SizedBox(
-        //   height: 10,
-        // ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -498,13 +482,9 @@ class _OrderWidgetState extends State<OrderWidget> {
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: Container(
-            // width: 300,
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: whiteColor,
-              // borderRadius: BorderRadius.all(
-              //   Radius.circular(26),
-              // ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -897,15 +877,15 @@ class _OrderWidgetState extends State<OrderWidget> {
                   style: infoLabel,
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 15,
                 ),
                 _buildItemDetailTotal("Tổng tiền hàng", totalItem),
                 SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 _buildItemDetailTotal("Giảm giá", discount, isDiscount: true),
                 SizedBox(
-                  height: 15,
+                  height: 10,
                 ),
                 _buildItemDetailTotal("Tổng tiền", total, isTotal: true),
                 // SizedBox(
@@ -929,7 +909,7 @@ class _OrderWidgetState extends State<OrderWidget> {
           label,
           style: GoogleFonts.barlow(
             fontSize: isTotal ? 20 : 18,
-            color: blackColor,
+            color: isDiscount ? blackColor.withOpacity(0.7) : blackColor,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
           ),
         ),
@@ -941,7 +921,11 @@ class _OrderWidgetState extends State<OrderWidget> {
                 : NumberFormat('###,###.### đ').format(money),
             style: GoogleFonts.barlow(
               fontSize: isTotal ? 20 : 18,
-              color: isTotal ? branchColor : blackColor,
+              color: isTotal
+                  ? branchColor
+                  : isDiscount
+                      ? blackColor.withOpacity(0.7)
+                      : blackColor,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
             ),
             textAlign: TextAlign.end,
@@ -1048,18 +1032,18 @@ class _OrderWidgetState extends State<OrderWidget> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: branchColor),
+        border: Border.all(color: branchColor.withOpacity(0.8), width: 1.5),
       ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
         child: Row(
           children: [
             Text(
-              promotion.code.toString(),
+              "Voucher ${promotion.code}",
               style: GoogleFonts.barlow(
                 fontSize: 16,
-                color: branchColor,
-                fontWeight: FontWeight.w500,
+                color: branchColor.withOpacity(0.8),
+                fontWeight: FontWeight.w600,
               ),
             ),
             SizedBox(
@@ -1069,8 +1053,8 @@ class _OrderWidgetState extends State<OrderWidget> {
               "- Giảm ${promotion.perDiscount! * 100}%",
               style: GoogleFonts.barlow(
                 fontSize: 16,
-                color: branchColor,
-                fontWeight: FontWeight.w500,
+                color: branchColor.withOpacity(0.8),
+                fontWeight: FontWeight.w600,
               ),
             ),
             Spacer(),
@@ -1083,7 +1067,7 @@ class _OrderWidgetState extends State<OrderWidget> {
               },
               child: Icon(
                 Icons.remove_circle_rounded,
-                color: branchColor,
+                color: branchColor.withOpacity(0.8),
               ),
             )
           ],

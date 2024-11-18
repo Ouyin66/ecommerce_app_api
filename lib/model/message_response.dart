@@ -1,3 +1,4 @@
+import 'package:ecommerce_app_api/model/notification.dart';
 import 'package:ecommerce_app_api/model/promotion.dart';
 
 import 'location.dart';
@@ -13,6 +14,7 @@ class MessageResponse {
   final Cart? cart;
   final Location? location;
   final Promotion? promotion;
+  final MyNotification? notification;
   final String? errorMessage;
   final String? anotherError;
   final String? successMessage;
@@ -26,6 +28,7 @@ class MessageResponse {
       this.cart,
       this.location,
       this.promotion,
+      this.notification,
       this.successMessage,
       this.errorMessage,
       this.anotherError,

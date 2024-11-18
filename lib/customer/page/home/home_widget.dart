@@ -1,10 +1,10 @@
-import 'package:ecommerce_app_api/api/apicategory.dart';
-import 'package:ecommerce_app_api/api/apicolor.dart';
-import 'package:ecommerce_app_api/api/apigender.dart';
-import 'package:ecommerce_app_api/api/apipicture.dart';
-import 'package:ecommerce_app_api/api/apiproduct.dart';
-import 'package:ecommerce_app_api/api/apisize.dart';
-import 'package:ecommerce_app_api/api/apivariant.dart';
+import 'package:ecommerce_app_api/api/api_category.dart';
+import 'package:ecommerce_app_api/api/api_color.dart';
+import 'package:ecommerce_app_api/api/api_gender.dart';
+import 'package:ecommerce_app_api/api/api_picture.dart';
+import 'package:ecommerce_app_api/api/api_product.dart';
+import 'package:ecommerce_app_api/api/api_size.dart';
+import 'package:ecommerce_app_api/api/api_variant.dart';
 import 'package:ecommerce_app_api/config/const.dart';
 import 'package:ecommerce_app_api/customer/page/cart/cart_widget.dart';
 import 'package:ecommerce_app_api/model/category.dart';
@@ -82,6 +82,7 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   void searching(String query) {
     if (query != '') {
+      filterProducts();
       filteredProducts = filteredProducts
           .where((p) => p.name!.toLowerCase().contains(query.toLowerCase()))
           .toList();

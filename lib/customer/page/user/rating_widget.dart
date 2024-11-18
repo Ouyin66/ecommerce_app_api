@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
-
 import '../../../config/const.dart';
 
-class OrderTrackingWidget extends StatefulWidget {
-  const OrderTrackingWidget({super.key});
+class RatingWidget extends StatefulWidget {
+  const RatingWidget({super.key});
 
   @override
-  State<OrderTrackingWidget> createState() => _OrderTrackingWidgetState();
+  State<RatingWidget> createState() => _RatingWidgetState();
 }
 
-class _OrderTrackingWidgetState extends State<OrderTrackingWidget> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
+class _RatingWidgetState extends State<RatingWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

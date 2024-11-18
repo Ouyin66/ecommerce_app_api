@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:ecommerce_app_api/model/cart.dart';
-import 'package:ecommerce_app_api/model/loginresponse.dart';
+import 'package:ecommerce_app_api/model/message_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:ecommerce_app_api/api/api.dart';
 

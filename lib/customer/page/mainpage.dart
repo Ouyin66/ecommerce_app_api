@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../model/user.dart';
 
 import 'favorite/favorite_widget.dart';
-import 'history/order_tracking_widget.dart';
+import 'history/history_widget.dart';
 import 'home/home_widget.dart';
 import 'user/notification_widget.dart';
 import 'user/user_widget.dart';
@@ -23,8 +23,9 @@ class _MainPageState extends State<MainPage> {
   static final List<Widget> _widgetOptions = <Widget>[
     HomeWidget(),
     FavoriteWidget(),
-    OrderTrackingWidget(),
     NotificationWidget(),
+    HistoryWidget(),
+
     // UserWidget(),
   ];
 
@@ -65,8 +66,8 @@ class _MainPageState extends State<MainPage> {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withAlpha(50),
-                    blurRadius: 20,
-                    spreadRadius: 10,
+                    blurRadius: 15,
+                    spreadRadius: 5,
                   ),
                 ],
                 borderRadius: BorderRadius.circular(16),
@@ -84,10 +85,10 @@ class _MainPageState extends State<MainPage> {
                       _buildNavItem(Icons.home_outlined, Icons.home_rounded, 0),
                       _buildNavItem(
                           Icons.favorite_border_outlined, Icons.favorite, 1),
-                      _buildNavItem(
-                          Icons.receipt_long_rounded, Icons.receipt_long, 2),
                       _buildNavItem(Icons.notifications_none_outlined,
-                          Icons.notifications, 3),
+                          Icons.notifications, 2),
+                      _buildNavItem(
+                          Icons.receipt_long_rounded, Icons.receipt_long, 3),
                       _buildNavItem(
                           Icons.person_outline_outlined, Icons.person, 4),
                     ],

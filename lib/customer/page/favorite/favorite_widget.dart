@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../config/const.dart';
+
 class FavoriteWidget extends StatefulWidget {
   const FavoriteWidget({super.key});
 
@@ -9,7 +11,20 @@ class FavoriteWidget extends StatefulWidget {
 
 class _FavoriteWidgetState extends State<FavoriteWidget> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: whiteColor,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
+        child: Column(
+          children: [],
+        ),
+      ),
+    );
   }
 }
