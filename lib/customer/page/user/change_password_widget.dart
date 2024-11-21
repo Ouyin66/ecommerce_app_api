@@ -1,12 +1,8 @@
 import 'package:ecommerce_app_api/api/api.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
 import '../../../model/user.dart';
-import 'user_widget.dart';
 
 class ChangePasswordWidget extends StatefulWidget {
   final User user;

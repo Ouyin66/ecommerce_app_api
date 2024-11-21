@@ -1,6 +1,5 @@
 import 'package:ecommerce_app_api/api/api_promotion.dart';
 import 'package:ecommerce_app_api/config/const.dart';
-import 'package:ecommerce_app_api/customer/page/order/voucher_widget.dart';
 import 'package:ecommerce_app_api/customer/page/user/location_widget.dart';
 import 'package:ecommerce_app_api/customer/services/stripe_service.dart';
 import 'package:ecommerce_app_api/model/cart.dart';

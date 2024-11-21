@@ -16,8 +16,9 @@ class StripeService {
       String name, String email, Receipt receipt, BuildContext context) async {
     try {
       final response = await _createPaymentIntent(receipt.total!, "vnd");
-      if (response == null || response['paymentIntentClientSecret'] == null)
+      if (response == null || response['paymentIntentClientSecret'] == null) {
         return;
+      }
 
       receipt.paymentId = response['paymentIntentId'];
 

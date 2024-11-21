@@ -59,10 +59,9 @@ class APICart extends APIRepository {
   }
 
   Future<MessageResponse?> updateCart(
-      int id, int userId, int variantId, int quantity, double price) async {
+      int userId, int variantId, int quantity, double price) async {
     try {
       Uri uri = Uri.parse("$baseurl/Cart/Update").replace(queryParameters: {
-        'id': id.toString(),
         'userId': userId.toString(),
         'variantId': variantId.toString(),
         'quantity': quantity.toString(),

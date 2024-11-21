@@ -7,7 +7,6 @@ import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
 import '../../../model/receipt.dart';
 import '../../../model/user.dart';
-import 'dart:convert';
 import 'package:intl/intl.dart';
 
 import '../history/receipt_detail_widget.dart';
@@ -27,12 +26,8 @@ class _NotificationWidgetState extends State<NotificationWidget> {
 
   void getDataUser() async {
     user = await getUser();
-    if (user != null) {
-      print("Tìm thấy user");
-      getNotification(user.id!);
-    } else {
-      print("Không tìm thấy user");
-    }
+    print("Tìm thấy user");
+    getNotification(user.id!);
     setState(() {});
   }
 
@@ -77,7 +72,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return lst.length == 0
+    return lst.isEmpty
         ? LoadingScreen()
         : Scaffold(
             backgroundColor: whiteColor,
@@ -89,7 +84,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildTitle(),
-                    lstNew.isNotEmpty || lstNew.length != 0
+                    lstNew.isNotEmpty || lstNew.isNotEmpty
                         ? SizedBox(
                             width: double.infinity,
                             child: _buildSecondTitle("Chưa xem"),
@@ -99,7 +94,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                     //   height: 5,
                     // ),
                     _BuildList(lstNew),
-                    lstOld.isNotEmpty || lstOld.length != 0
+                    lstOld.isNotEmpty || lstOld.isNotEmpty
                         ? SizedBox(
                             width: double.infinity,
                             child: _buildSecondTitle("Đã xem"),

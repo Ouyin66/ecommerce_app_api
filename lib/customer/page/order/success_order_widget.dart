@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../model/receipt.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:intl/intl.dart';
-import 'package:dotted_line/dotted_line.dart';
 
 class SuccessWidget extends StatefulWidget {
   final Receipt receipt;
@@ -22,10 +21,11 @@ class _SuccessWidgetState extends State<SuccessWidget> {
 
   void getData() async {
     var user = await APIUser().getUser(receipt!.id!);
-    if (user != null)
+    if (user != null) {
       return setState(() {
         name = user.user?.name;
       });
+    }
   }
 
   @override

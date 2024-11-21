@@ -3,7 +3,6 @@ import 'package:ecommerce_app_api/model/receipt.dart';
 import 'package:ecommerce_app_api/model/receipt_variant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:convert';
 import 'package:intl/intl.dart';
 import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
@@ -32,11 +31,7 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
   //"HD${receipt?.id.toString().padLeft(10, '0')}"
   void getDataUser() async {
     user = await getUser();
-    if (user != null) {
-      print("Tìm thấy user");
-    } else {
-      print("Không tìm thấy user");
-    }
+    print("Tìm thấy user");
     setState(() {});
   }
 

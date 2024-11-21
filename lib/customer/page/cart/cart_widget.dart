@@ -76,12 +76,8 @@ class _CartWidgetState extends State<CartWidget> {
 
   void getDataUser() async {
     user = await getUser();
-    if (user != null) {
-      print("Tìm thấy user");
-      getList(user.id!);
-    } else {
-      print("Không tìm thấy user");
-    }
+    print("Tìm thấy user");
+    getList(user.id!);
     setState(() {});
   }
 
@@ -94,8 +90,8 @@ class _CartWidgetState extends State<CartWidget> {
     var selectedCart = Provider.of<SelectedCart>(context, listen: false);
 
     if (cart.quantity! > 1 && cart.quantity! < cart.variant!.quantity!) {
-      var response = await APICart().updateCart(cart.id!, cart.userId!,
-          cart.variant!.id!, cart.quantity! - 1, cart.price!);
+      var response = await APICart().updateCart(
+          cart.userId!, cart.variant!.id!, cart.quantity! - 1, cart.price!);
       if (response?.successMessage != null) {
         await getList(user.id!);
         if (selectedCart.selected(response!.cart!)) {
@@ -114,8 +110,8 @@ class _CartWidgetState extends State<CartWidget> {
     var selectedCart = Provider.of<SelectedCart>(context, listen: false);
 
     if (cart.quantity! < 3 && cart.quantity! < cart.variant!.quantity!) {
-      var response = await APICart().updateCart(cart.id!, cart.userId!,
-          cart.variant!.id!, cart.quantity! + 1, cart.price!);
+      var response = await APICart().updateCart(
+          cart.userId!, cart.variant!.id!, cart.quantity! + 1, cart.price!);
       if (response?.successMessage != null) {
         await getList(user.id!);
         if (selectedCart.selected(response!.cart!)) {
@@ -505,7 +501,7 @@ class _CartWidgetState extends State<CartWidget> {
                                             Icons.remove_rounded,
                                           ),
                                         ),
-                                        Container(
+                                        SizedBox(
                                           height: 15,
                                           child: VerticalDivider(
                                             width: 1,
@@ -523,7 +519,7 @@ class _CartWidgetState extends State<CartWidget> {
                                             ),
                                           ),
                                         ),
-                                        Container(
+                                        SizedBox(
                                           height: 15,
                                           child: VerticalDivider(
                                             width: 1,
@@ -902,7 +898,6 @@ class _CartWidgetState extends State<CartWidget> {
                             ? null
                             : () async {
                                 var response = await APICart().updateCart(
-                                    cart.id!,
                                     user.id!,
                                     _selectedVariant.id!,
                                     _quantity!,

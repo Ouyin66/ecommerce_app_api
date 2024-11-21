@@ -4,7 +4,6 @@ import 'package:ecommerce_app_api/customer/page/user/change_password_widget.dart
 import 'package:ecommerce_app_api/customer/page/user/location_widget.dart';
 import 'package:ecommerce_app_api/model/selectedcart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../api/sharepre.dart';
@@ -13,9 +12,7 @@ import '../../../login_widget.dart';
 import '../../../main.dart';
 import '../../../model/user.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 import 'edit_user_widget.dart';
 import 'rating_widget.dart';
@@ -193,7 +190,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
   }
 
   Widget buildImage(double size) {
-    final imageUrl;
+    final String? imageUrl;
     if (user?.image == null || user?.image == '') {
       imageUrl = urlLogo;
     } else {
@@ -208,7 +205,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
           },
           child: imageUrl == urlLogo
               ? Image.asset(
-                  imageUrl,
+                  imageUrl ?? '',
                   width: size,
                   height: size,
                   fit: BoxFit.cover,
@@ -216,7 +213,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
                       Icon(Icons.image_rounded),
                 )
               : Image.network(
-                  imageUrl,
+                  imageUrl ?? '',
                   width: size,
                   height: size,
                   fit: BoxFit.cover,
@@ -396,7 +393,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
   }
 
   Widget buildButton(IconData icon, String label,
-      {Widget? widget = null, Function? function, bool isLogout = false}) {
+      {Widget? widget, Function? function, bool isLogout = false}) {
     return InkWell(
       onTap: () {
         if (isLogout && function != null) {
@@ -442,7 +439,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
   }
 
   Widget builThirdBox() {
-    var formattedDate;
+    String formattedDate = '';
 
     if (user!.dateCreate != null) {
       DateTime dateTime = DateTime.parse(user!.dateCreate!);
@@ -482,7 +479,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
                   height: 20,
                 ),
                 Text(
-                  "Tài khoản tạo ngày: ${formattedDate ?? ''}",
+                  "Tài khoản tạo ngày: $formattedDate",
                   style: GoogleFonts.barlow(
                     fontSize: 18,
                     color: blackColor,

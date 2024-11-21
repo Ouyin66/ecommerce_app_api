@@ -2,7 +2,6 @@ import 'package:ecommerce_app_api/api/api_receipt.dart';
 import 'package:ecommerce_app_api/customer/page/history/receipt_detail_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:convert';
 import 'package:intl/intl.dart';
 import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
@@ -35,12 +34,8 @@ class _HistoryWidgetState extends State<HistoryWidget> {
 
   void getDataUser() async {
     user = await getUser();
-    if (user != null) {
-      print("Tìm thấy user");
-      getListReceipt(user.id!);
-    } else {
-      print("Không tìm thấy user");
-    }
+    print("Tìm thấy user");
+    getListReceipt(user.id!);
     setState(() {});
   }
 

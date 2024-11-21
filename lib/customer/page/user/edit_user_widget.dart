@@ -1,18 +1,12 @@
 import 'dart:io';
 
-import 'package:ecommerce_app_api/model/selectedcart.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../api/api.dart';
 import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
-import '../../../login_widget.dart';
 import '../../../model/user.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:convert';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 
 class EditUserWidget extends StatefulWidget {
@@ -76,17 +70,13 @@ class _EditUserWidgetState extends State<EditUserWidget> {
 
   void getDataUser() async {
     user = await getUser();
-    if (user != null) {
-      print("Tìm thấy user");
-      _nameController.text = user.name!;
-      _emailController.text = user.email!;
-      _phoneController.text = user.phone!;
-      _passwordController.text = "*********${user.password!.characters.last}";
-      _dateCreateController.text = user.dateCreate!;
-      _selectedGender = user.gender;
-    } else {
-      print("Không tìm thấy user");
-    }
+    print("Tìm thấy user");
+    _nameController.text = user.name!;
+    _emailController.text = user.email!;
+    _phoneController.text = user.phone!;
+    _passwordController.text = "*********${user.password!.characters.last}";
+    _dateCreateController.text = user.dateCreate!;
+    _selectedGender = user.gender;
     setState(() {});
   }
 
@@ -170,7 +160,7 @@ class _EditUserWidgetState extends State<EditUserWidget> {
   }
 
   Widget buildImage(double size) {
-    final imageUrl;
+    final String? imageUrl;
     if (user.image == null || user.image == '') {
       imageUrl = urlLogo;
     } else {
@@ -185,7 +175,7 @@ class _EditUserWidgetState extends State<EditUserWidget> {
           },
           child: imageUrl == urlLogo
               ? Image.asset(
-                  imageUrl,
+                  imageUrl ?? '',
                   width: size,
                   height: size,
                   fit: BoxFit.cover,
@@ -193,7 +183,7 @@ class _EditUserWidgetState extends State<EditUserWidget> {
                       Icon(Icons.image_rounded),
                 )
               : Image.network(
-                  imageUrl,
+                  imageUrl ?? '',
                   width: size,
                   height: size,
                   fit: BoxFit.cover,

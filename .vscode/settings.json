@@ -3,5 +3,6 @@
         "định",
         "Không"
     ],
-    "CodeGPT.apiKey": "CodeGPT Plus Beta"
+    "CodeGPT.apiKey": "CodeGPT Plus Beta",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

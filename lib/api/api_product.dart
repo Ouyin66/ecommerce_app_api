@@ -16,7 +16,7 @@ class APIProduct extends APIRepository {
         final Map<String, dynamic> data = jsonDecode(response.body);
 
         // Parse danh sách sản phẩm
-        List<Product> products = (data['dataa'] as List)
+        List<Product> products = (data['data'] as List)
             .map((productJson) => Product.fromJson(productJson))
             .toList();
 
