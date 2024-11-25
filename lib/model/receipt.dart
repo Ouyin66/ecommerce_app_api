@@ -5,6 +5,7 @@ import 'receipt_variant.dart';
 class Receipt {
   int? id;
   int? userId;
+  String? name;
   String? address;
   String? phone;
   double? discount;
@@ -18,6 +19,7 @@ class Receipt {
   Receipt({
     this.id,
     this.userId,
+    this.name,
     this.address,
     this.phone,
     this.discount,
@@ -38,6 +40,7 @@ class Receipt {
     return Receipt(
       id: json["id"] ?? 0,
       userId: json["userId"] ?? 0,
+      name: json["name"] ?? '',
       address: json["address"] ?? '',
       phone: json["phone"] ?? '',
       discount: json["discount"] ?? 0.0,
@@ -59,6 +62,7 @@ class Receipt {
     final json = {
       "id": id,
       "userId": userId,
+      "name": name,
       "address": address,
       "phone": phone,
       "discount": discount,
@@ -67,6 +71,7 @@ class Receipt {
       "total": total,
       "dateCreate": dateCreate,
       'receiptVariants': receiptVariants.map((v) => v.toJson()).toList(),
+      // 'orderStatusHistories': orderStatusHistories ?? [],
     };
 
     // Loại bỏ các giá trị null

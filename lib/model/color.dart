@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 class MyColor {
   int? id;
   String? name;
-  String? image;
+  Uint8List? image;
 
   MyColor({
     this.id,
@@ -21,7 +24,9 @@ class MyColor {
     return MyColor(
       id: json["id"] ?? 0,
       name: json["name"] ?? '',
-      image: json["image"] == null || json["image"] == '' ? "" : json["image"],
+      image: json["image"] != null
+          ? base64Decode(json["image"]) // Giải mã base64 thành Uint8List
+          : null,
     );
   }
 
@@ -29,7 +34,7 @@ class MyColor {
     return {
       "id": id,
       "name": name,
-      "image": image,
+      "image": image != null ? base64Encode(image!) : null,
     };
   }
 }

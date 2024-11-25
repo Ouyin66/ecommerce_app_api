@@ -22,7 +22,7 @@ class SelectedCart extends ChangeNotifier {
   }
 
   Future<void> getDefaultAddress(int locationId) async {
-    var location = await APILocation().getLocation(locationId);
+    var location = await APILocation().Get(locationId);
 
     if (location != null) {
       selectedLocation = location;

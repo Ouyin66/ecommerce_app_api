@@ -23,7 +23,7 @@ class _ChangePasswordWidgetState extends State<ChangePasswordWidget> {
 
   void changePassword() async {
     var response = await APIUser()
-        .changePassword(widget.user.id!, _newpasswordController.text);
+        .ChangePassword(widget.user.id!, _newpasswordController.text);
     if (response?.user != null) {
       if (await saveUser(response!.user!)) {
         widget.user.password = response.user!.password;

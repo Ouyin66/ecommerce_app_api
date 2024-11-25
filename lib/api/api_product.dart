@@ -31,7 +31,7 @@ class APIProduct extends APIRepository {
     }
   }
 
-  Future<Product?> getProduct(int id) async {
+  Future<Product?> Get(int id) async {
     try {
       Uri uri = Uri.parse("$baseurl/Product/Get").replace(queryParameters: {
         'id': id.toString(),

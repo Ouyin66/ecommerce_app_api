@@ -9,7 +9,7 @@ class APIRepository {
 
 class APIUser extends APIRepository {
   // Login method
-  Future<MessageResponse?> login(String email, String password) async {
+  Future<MessageResponse?> Login(String email, String password) async {
     try {
       Uri uri = Uri.parse("$baseurl/User/Login").replace(queryParameters: {
         'email': email,
@@ -35,7 +35,7 @@ class APIUser extends APIRepository {
   }
 
   // Register method
-  Future<MessageResponse?> register(
+  Future<MessageResponse?> Register(
       String name, String email, String phone, String password) async {
     try {
       Uri uri = Uri.parse("$baseurl/User/Register").replace(queryParameters: {
@@ -62,7 +62,7 @@ class APIUser extends APIRepository {
   }
 
   // Forgot Password method
-  Future<MessageResponse?> forgotPassword(String email) async {
+  Future<MessageResponse?> ForgotPassword(String email) async {
     try {
       Uri uri =
           Uri.parse("$baseurl/User/ForgotPassword").replace(queryParameters: {
@@ -86,7 +86,7 @@ class APIUser extends APIRepository {
   }
 
   // Signin with Google method
-  Future<MessageResponse?> signInGoogle(String? email, String? providerID,
+  Future<MessageResponse?> SignInGoogle(String? email, String? providerID,
       String? photoUrl, String? displayName) async {
     try {
       Uri uri =
@@ -111,7 +111,7 @@ class APIUser extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> changePassword(int id, String? newPassword) async {
+  Future<MessageResponse?> ChangePassword(int id, String? newPassword) async {
     try {
       Uri uri =
           Uri.parse("$baseurl/User/ChangePassword").replace(queryParameters: {
@@ -136,7 +136,7 @@ class APIUser extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> updateInformation(User user) async {
+  Future<MessageResponse?> UpdateInformation(User user) async {
     try {
       Uri uri = Uri.parse("$baseurl/User/UpdateInformation")
           .replace(queryParameters: {
@@ -164,7 +164,7 @@ class APIUser extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> getUser(int userId) async {
+  Future<MessageResponse?> Get(int userId) async {
     try {
       Uri uri = Uri.parse("$baseurl/User/Get").replace(queryParameters: {
         'id': userId.toString(),

@@ -36,7 +36,7 @@ class _LocationWidgetState extends State<LocationWidget> {
   String _query = '';
 
   void getList() async {
-    list = await APILocation().getLocationByUser(user!.id!);
+    list = await APILocation().GetLocationByUser(user!.id!);
     if (list != null) {
       searchingList = List.from(list!);
       print("Lấy được danh sách");
@@ -65,7 +65,7 @@ class _LocationWidgetState extends State<LocationWidget> {
         name: _nameController.text,
         address: _addressController.text);
 
-    var response = await APILocation().insertLocation(location);
+    var response = await APILocation().Insert(location);
 
     setState(() {
       errorMessage = null;
@@ -91,8 +91,8 @@ class _LocationWidgetState extends State<LocationWidget> {
   }
 
   void edit() async {
-    var response = await APILocation().updateLocation(
-        _idLocation!, _nameController.text, _addressController.text);
+    var response = await APILocation()
+        .Update(_idLocation!, _nameController.text, _addressController.text);
 
     setState(() {
       errorMessage = null;
@@ -114,7 +114,7 @@ class _LocationWidgetState extends State<LocationWidget> {
   }
 
   void delete(int id) async {
-    var response = await APILocation().deleteLocation(id);
+    var response = await APILocation().Delete(id);
     setState(() {
       if (response?.successMessage != null) {
         getList();

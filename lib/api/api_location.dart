@@ -6,7 +6,7 @@ import '../model/location.dart';
 import '../model/message_response.dart';
 
 class APILocation extends APIRepository {
-  Future<List<Location>?> getLocationByUser(int userId) async {
+  Future<List<Location>?> GetLocationByUser(int userId) async {
     try {
       Uri uri =
           Uri.parse("$baseurl/Location/ListByUserId").replace(queryParameters: {
@@ -33,7 +33,7 @@ class APILocation extends APIRepository {
     }
   }
 
-  Future<Location?> getLocation(int id) async {
+  Future<Location?> Get(int id) async {
     try {
       Uri uri = Uri.parse("$baseurl/Location/Get").replace(queryParameters: {
         'id': id.toString(),
@@ -60,7 +60,7 @@ class APILocation extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> insertLocation(Location location) async {
+  Future<MessageResponse?> Insert(Location location) async {
     try {
       Uri uri = Uri.parse("$baseurl/Location/Insert").replace(queryParameters: {
         'userId': location.userId.toString(),
@@ -94,8 +94,7 @@ class APILocation extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> updateLocation(
-      int id, String name, String address) async {
+  Future<MessageResponse?> Update(int id, String name, String address) async {
     try {
       Uri uri = Uri.parse("$baseurl/Location/Update").replace(queryParameters: {
         'id': id.toString(),
@@ -129,7 +128,7 @@ class APILocation extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> deleteLocation(int id) async {
+  Future<MessageResponse?> Delete(int id) async {
     try {
       Uri uri = Uri.parse("$baseurl/Location/Delete").replace(queryParameters: {
         'id': id.toString(),

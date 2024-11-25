@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:ecommerce_app_api/api/api.dart';
 
 class APICart extends APIRepository {
-  Future<List<Cart>?> getCartByUser(int userId) async {
+  Future<List<Cart>?> GetCartByUser(int userId) async {
     try {
       Uri uri =
           Uri.parse("$baseurl/Cart/ListByUserId").replace(queryParameters: {
@@ -32,7 +32,7 @@ class APICart extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> insertCart(
+  Future<MessageResponse?> Insert(
       int userId, int variantId, int quantity, double price) async {
     try {
       Uri uri = Uri.parse("$baseurl/Cart/Insert").replace(queryParameters: {
@@ -58,11 +58,12 @@ class APICart extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> updateCart(
-      int userId, int variantId, int quantity, double price) async {
+  Future<MessageResponse?> Update(int userId, int oldVariantId, int variantId,
+      int quantity, double price) async {
     try {
       Uri uri = Uri.parse("$baseurl/Cart/Update").replace(queryParameters: {
         'userId': userId.toString(),
+        'oldVariantId': oldVariantId.toString(),
         'variantId': variantId.toString(),
         'quantity': quantity.toString(),
         'price': price.toString(),
@@ -86,10 +87,11 @@ class APICart extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> deleteCart(int id) async {
+  Future<MessageResponse?> Delete(int userId, int variantId) async {
     try {
       Uri uri = Uri.parse("$baseurl/Cart/Delete").replace(queryParameters: {
-        'id': id.toString(),
+        'userId': userId.toString(),
+        'variantId': variantId.toString(),
       });
 
       final response = await http.delete(uri);

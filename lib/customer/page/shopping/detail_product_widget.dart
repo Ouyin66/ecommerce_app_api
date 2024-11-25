@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:ecommerce_app_api/api/api_cart.dart';
 import 'package:ecommerce_app_api/config/const.dart';
 import 'package:ecommerce_app_api/model/color.dart';
@@ -7,7 +10,7 @@ import 'package:ecommerce_app_api/model/variant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
+import 'package:flutter_avif/flutter_avif.dart';
 import '../../../api/sharepre.dart';
 import '../../../model/user.dart';
 
@@ -38,20 +41,27 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
         ? null
         : widget.product.listSize?.firstWhere((s) => s.id == sizeId);
 
-    if (sizeId != null) {
-      _selectedVariant = widget.product.listVariant?.firstWhere(
-        (v) => v.colorID == colorId && v.sizeID == sizeId,
-        orElse: () => Variant.variantEmpty(),
-      );
-    } else {
-      _selectedVariant = widget.product.listVariant?.firstWhere(
-        (v) => v.colorID == colorId,
-        orElse: () => Variant.variantEmpty(),
-      );
-    }
+    // if (sizeId != null) {
+    //   _selectedVariant = widget.product.listVariant?.firstWhere(
+    //     (v) => v.colorID == colorId && v.sizeID == sizeId,
+    //     orElse: () => Variant.variantEmpty(),
+    //   );
+    // } else {
+    //   _selectedVariant = widget.product.listVariant?.firstWhere(
+    //     (v) => v.colorID == colorId,
+    //     orElse: () => Variant.variantEmpty(),
+    //   );
+    // }
+
+    _selectedVariant = widget.product.listVariant!.firstWhere(
+      (v) => v.colorID == colorId && v.sizeID == sizeId,
+      orElse: () => Variant.variantEmpty(),
+    );
 
     _currentIndex = widget.product.listPicture!.indexWhere(
-      (picture) => picture.image == _selectedVariant?.picture,
+      (picture) =>
+          base64Encode(picture.image as List<int>) ==
+          base64Encode(_selectedVariant?.picture as List<int>),
     );
 
     if (_currentIndex == -1) {
@@ -76,7 +86,7 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
 
   void plusQuantity() {
     setState(() {
-      if (_quantity < 3 && _quantity < _selectedVariant!.quantity!) {
+      if (_quantity < _selectedVariant!.quantity!) {
         _quantity = _quantity + 1;
       }
     });
@@ -183,13 +193,21 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        Image.network(
+                        AvifImage.memory(
                           widget.product.listPicture![_currentIndex].image!,
                           width: double.infinity,
                           height: 400,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Icon(Icons.broken_image, size: 150),
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.memory(
+                              widget.product.listPicture![_currentIndex].image!,
+                              width: double.infinity,
+                              height: 400,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Icon(Icons.broken_image, size: 150),
+                            );
+                          },
                         ),
                         Positioned(
                           left: 0,
@@ -313,22 +331,20 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                       height: 10,
                     ),
                     // Kích cỡ sản phẩm
-                    sizeId == null
-                        ? SizedBox()
-                        : Text.rich(
-                            TextSpan(
-                              text: "Kích cỡ:   ",
-                              style: label,
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: widget.product.listSize
-                                      ?.firstWhere((s) => s.id == sizeId)
-                                      .name,
-                                  style: labelGrey,
-                                ),
-                              ],
-                            ),
+                    Text.rich(
+                      TextSpan(
+                        text: "Kích cỡ:   ",
+                        style: label,
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: widget.product.listSize
+                                ?.firstWhere((s) => s.id == sizeId)
+                                .name,
+                            style: labelGrey,
                           ),
+                        ],
+                      ),
+                    ),
                     sizeId == null
                         ? SizedBox()
                         : SizedBox(
@@ -474,7 +490,11 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                   )
                 : null,
             image: DecorationImage(
-              image: NetworkImage(color.image!),
+              image: isAvifFile(color.image!) != AvifFileType.unknown
+                  ? MemoryAvifImage(
+                      color.image!,
+                    )
+                  : MemoryImage(color.image!),
               fit: BoxFit.cover,
               onError: (exception, stackTrace) =>
                   const Icon(Icons.broken_image),
@@ -549,44 +569,7 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.network(
-                        widget.product.listPicture![_currentIndex].image!,
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.cover,
-                        errorBuilder: (contextSheet, error, stackTrace) =>
-                            Icon(Icons.broken_image, size: 150),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.product.name.toString(),
-                              style: subhead,
-                              softWrap: true,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 3,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              "Tồn kho: ${_selectedVariant?.quantity}",
-                              style: categoryText,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildBoxSelectedVaraint(),
                   SizedBox(
                     height: 10,
                   ),
@@ -747,7 +730,7 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                         onPressed: _selectedVariant!.quantity! == 0
                             ? null
                             : () async {
-                                var addToCart = await APICart().insertCart(
+                                var addToCart = await APICart().Insert(
                                     user!.id!,
                                     _selectedVariant!.id!,
                                     _quantity,
@@ -766,7 +749,9 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
                           backgroundColor: blackColor,
                         ),
                         child: Text(
-                          "Thêm vào giỏ",
+                          _selectedVariant!.quantity! == 0
+                              ? "Hết hàng"
+                              : "Thêm vào giỏ",
                           style: subhead,
                           textAlign: TextAlign.center,
                         ),
@@ -777,6 +762,60 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
               ),
             );
           },
+        );
+      },
+    );
+  }
+
+  Widget _buildBoxSelectedVaraint() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Hình ảnh
+        _buildImageVariant(widget.product.listPicture![_currentIndex].image!),
+        SizedBox(
+          width: 20,
+        ),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.product.name.toString(),
+                style: subhead,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                "Tồn kho: ${_selectedVariant?.quantity}",
+                style: categoryText,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImageVariant(Uint8List image) {
+    return AvifImage.memory(
+      image,
+      width: 80,
+      height: 80,
+      fit: BoxFit.cover,
+      errorBuilder: (contextSheet, error, stackTrace) {
+        return Image.memory(
+          image,
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              Icon(Icons.broken_image, size: 150),
         );
       },
     );

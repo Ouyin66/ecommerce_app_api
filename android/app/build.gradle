@@ -25,7 +25,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "com.example.ecommerce_app_api"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion "26.3.11579264"
 
     compileOptions {
@@ -42,9 +42,9 @@ android {
         applicationId = "com.example.ecommerce_app_api"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdk = 21
+        minSdk = 24
         minSdkVersion flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 34
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }

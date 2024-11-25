@@ -13,7 +13,7 @@ import '../../../main.dart';
 import '../../../model/user.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
+import 'package:flutter_avif/flutter_avif.dart';
 import 'edit_user_widget.dart';
 import 'rating_widget.dart';
 
@@ -59,7 +59,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
       user?.image = _selectedImage;
     }
 
-    var response = await APIUser().updateInformation(user!);
+    var response = await APIUser().UpdateInformation(user!);
     if (response?.user != null) {
       if (await saveUser(response!.user!)) {
         if (response.successMessage != null) {

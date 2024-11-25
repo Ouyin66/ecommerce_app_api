@@ -10,26 +10,59 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1b881a71-b71b-4133-8224-c3e828dd8136" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/kotlin/com/example/ecommerce_app_api/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/kotlin/com/example/ecommerce_app_api/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values-night/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values-night/styles.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bug/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/bug/android/app/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bug/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/bug/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/administrator/mainpage.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_cart.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_cart.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_category.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_category.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_color.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_color.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_gender.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_gender.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_location.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_location.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_picture.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_picture.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/api/api_product.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_product.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_promotion.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_promotion.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/api/api_receipt.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_receipt.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_size.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_size.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/api_variant.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/api_variant.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/api/sharepre.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/api/sharepre.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/cart/cart_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/cart/cart_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/history/history_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/history/history_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/history/receipt_detail_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/history/receipt_detail_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/customer/page/home/home_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/home/home_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/order/order_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/order/order_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/order/success_order_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/order/success_order_widget.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/customer/page/order/voucher_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/order/voucher_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/customer/page/shopping/detail_product_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/shopping/detail_product_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/user/change_password_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/user/change_password_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/user/edit_user_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/user/edit_user_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/user/location_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/user/location_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/user/notification_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/user/notification_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/page/user/user_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/page/user/user_widget.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/customer/services/stripe_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/customer/services/stripe_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/forgot_password_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/forgot_password_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/login_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/login_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/model/color.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/color.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/model/picture.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/picture.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/model/receipt.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/receipt.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/model/selectedcart.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/selectedcart.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/model/variant.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/model/variant.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/register_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/register_widget.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,6 +91,9 @@
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
 }</component>
@@ -78,6 +114,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Flutter.main.dart.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -86,6 +123,8 @@
     "cidr.known.project.marker": "true",
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "io.flutter.reload.alreadyRun": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/ecommerce_app_api",
     "settings.editor.selected.configurable": "preferences.sourceCode.Gradle Declarative Configuration Language",
@@ -108,5 +147,16 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
     </layout>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

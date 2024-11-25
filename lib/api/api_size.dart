@@ -4,7 +4,7 @@ import 'package:ecommerce_app_api/api/api.dart';
 import '../model/size.dart';
 
 class APISize extends APIRepository {
-  Future<List<MySize>?> getSizeByProduct(int productId) async {
+  Future<List<MySize>?> GetSizeByProduct(int productId) async {
     try {
       Uri uri =
           Uri.parse("$baseurl/Size/ListByProductId").replace(queryParameters: {

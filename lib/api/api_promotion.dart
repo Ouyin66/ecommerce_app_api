@@ -32,7 +32,7 @@ class APIPromotion extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> getPromotionByCode(String code) async {
+  Future<MessageResponse?> GetPromotionByCode(String code) async {
     try {
       Uri uri = Uri.parse("$baseurl/Promotion/GetPromotionByCode")
           .replace(queryParameters: {

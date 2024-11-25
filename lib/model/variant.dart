@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:ecommerce_app_api/model/color.dart';
 import 'package:ecommerce_app_api/model/product.dart';
 import 'package:ecommerce_app_api/model/size.dart';
@@ -8,7 +11,7 @@ class Variant {
   int? colorID;
   int? sizeID;
   double? price;
-  String? picture;
+  Uint8List? picture;
   int? quantity;
   String? dateCreate;
 
@@ -38,7 +41,7 @@ class Variant {
       colorID: null,
       sizeID: null,
       price: null,
-      picture: '',
+      picture: null,
       quantity: null,
       dateCreate: '',
     );
@@ -51,9 +54,9 @@ class Variant {
       colorID: json["colorId"] ?? 0,
       sizeID: json["sizeId"] ?? 0,
       price: json["price"] ?? 0,
-      picture: json["picture"] == null || json["picture"] == ''
-          ? ""
-          : json["picture"],
+      picture: json["picture"] != null
+          ? base64Decode(json["picture"]) // Giải mã base64 thành Uint8List
+          : null,
       quantity: json["quantity"] ?? 0,
       dateCreate: json["dateCreate"] ?? '',
       color: json["color"] != null ? MyColor.fromJson(json["color"]) : null,
@@ -70,7 +73,7 @@ class Variant {
       "colorId": colorID,
       "sizeId": sizeID,
       "price": price,
-      "picture": picture,
+      "picture": picture != null ? base64Encode(picture!) : null,
       "quantity": quantity,
       "dateCreate": dateCreate,
     };

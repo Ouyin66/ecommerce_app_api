@@ -30,7 +30,7 @@ class APIVariant extends APIRepository {
   //     return null;
   //   }
   // }
-  Future<Variant?> getVariant(int id) async {
+  Future<Variant?> Get(int id) async {
     try {
       Uri uri = Uri.parse("$baseurl/Variant/Get").replace(queryParameters: {
         'id': id.toString(),
@@ -54,7 +54,7 @@ class APIVariant extends APIRepository {
     }
   }
 
-  Future<List<Variant>?> getVariantByProduct(int productId) async {
+  Future<List<Variant>?> GetVariantByProduct(int productId) async {
     try {
       Uri uri = Uri.parse("$baseurl/Variant/ListByProductId")
           .replace(queryParameters: {

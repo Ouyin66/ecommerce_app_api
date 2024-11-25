@@ -10,10 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../api/sharepre.dart';
 import '../../../model/receipt_variant.dart';
 import '../../../model/selectedcart.dart';
 import '../../../model/user.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_avif/flutter_avif.dart';
 
 class OrderWidget extends StatefulWidget {
   final User user;
@@ -28,7 +30,7 @@ class _OrderWidgetState extends State<OrderWidget> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _vouchercontroller = TextEditingController();
-  User user = User.userEmpty();
+  User user = User();
   List<Cart> lst = [];
   Promotion? voucher;
   double totalItem = 0;
@@ -72,6 +74,7 @@ class _OrderWidgetState extends State<OrderWidget> {
 
     return Receipt(
       userId: user.id,
+      name: user.name,
       address: _addressController.text,
       phone: user.phone,
       discount: discount,
@@ -79,13 +82,20 @@ class _OrderWidgetState extends State<OrderWidget> {
       interest: false,
       total: total,
       receiptVariants: receiptVariants,
+      // orderStatusHistories: [],
     );
+  }
+
+  void checkInfoUser() async {
+    await updateUser(user.id!);
+    user = await getUser();
   }
 
   @override
   void initState() {
     super.initState();
     user = widget.user;
+    checkInfoUser();
     lst = List.from(widget.items);
     totalItem =
         lst.fold(0, (sum, item) => sum + (item.price! * item.quantity!));
@@ -511,8 +521,7 @@ class _OrderWidgetState extends State<OrderWidget> {
 
   Widget _buildInfoUser(IconData icon, String label, String data) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon),
         SizedBox(
@@ -528,6 +537,7 @@ class _OrderWidgetState extends State<OrderWidget> {
         ),
         Spacer(),
         Expanded(
+          flex: 7,
           child: Text(
             data,
             style: infoLabel,
@@ -613,7 +623,12 @@ class _OrderWidgetState extends State<OrderWidget> {
                       border: Border.all(color: greyColor.withOpacity(0.3)),
                       borderRadius: BorderRadius.all(Radius.circular(16)),
                       image: DecorationImage(
-                        image: NetworkImage(item.variant?.picture ?? ''),
+                        image: isAvifFile(item.variant!.picture!) !=
+                                AvifFileType.unknown
+                            ? MemoryAvifImage(
+                                item.variant!.picture!,
+                              )
+                            : MemoryImage(item.variant!.picture!),
                         fit: BoxFit.cover,
                         onError: (exception, stackTrace) => const Icon(
                           Icons.broken_image,
@@ -675,19 +690,15 @@ class _OrderWidgetState extends State<OrderWidget> {
                                                 color: blackColor,
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                          item.product?.listSize == null ||
-                                                  item.product!.listSize!
-                                                      .isEmpty
-                                              ? TextSpan()
-                                              : TextSpan(
-                                                  text:
-                                                      ', ${item.product!.listSize?.where((s) => s.id == item.variant!.sizeID).first.name}',
-                                                  style: GoogleFonts.barlow(
-                                                    fontSize: 15,
-                                                    color: blackColor,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
+                                          TextSpan(
+                                            text:
+                                                ', ${item.product!.listSize?.where((s) => s.id == item.variant!.sizeID).first.name}',
+                                            style: GoogleFonts.barlow(
+                                              fontSize: 15,
+                                              color: blackColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     )
@@ -1006,7 +1017,7 @@ class _OrderWidgetState extends State<OrderWidget> {
           showToast(context, "Hãy nhập mã voucher vào", isError: true);
         } else {
           var response =
-              await APIPromotion().getPromotionByCode(_vouchercontroller.text);
+              await APIPromotion().GetPromotionByCode(_vouchercontroller.text);
           if (response?.promotion != null) {
             voucher = response?.promotion;
             _vouchercontroller.clear();

@@ -5,30 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:ecommerce_app_api/api/api.dart';
 
 class APIReceipt extends APIRepository {
-  Future<Receipt?> GetReceipt(int receiptId) async {
-    try {
-      Uri uri = Uri.parse("$baseurl/Receipt/Get").replace(queryParameters: {
-        'receiptId': receiptId.toString(),
-      });
-
-      final response = await http.get(uri);
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-
-        Receipt receipt = Receipt.fromJson(data['receipt']);
-
-        return receipt;
-      } else {
-        print("Lỗi khi lấy hóa đơn: ${response.statusCode}");
-        return null;
-      }
-    } catch (e) {
-      print("Lỗi: $e");
-      return null;
-    }
-  }
-
   Future<List<Receipt>?> GetListByUser(int userId) async {
     try {
       Uri uri =
@@ -59,7 +35,31 @@ class APIReceipt extends APIRepository {
     }
   }
 
-  Future<Receipt?> createReceipt(Receipt receipt) async {
+  Future<Receipt?> Get(int receiptId) async {
+    try {
+      Uri uri = Uri.parse("$baseurl/Receipt/Get").replace(queryParameters: {
+        'receiptId': receiptId.toString(),
+      });
+
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+
+        Receipt receipt = Receipt.fromJson(data['receipt']);
+
+        return receipt;
+      } else {
+        print("Lỗi khi lấy hóa đơn: ${response.statusCode}");
+        return null;
+      }
+    } catch (e) {
+      print("Lỗi: $e");
+      return null;
+    }
+  }
+
+  Future<Receipt?> Create(Receipt receipt) async {
     final url = Uri.parse('$baseurl/Receipt/Insert');
 
     final response = await http.post(
@@ -72,7 +72,7 @@ class APIReceipt extends APIRepository {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
-      Receipt receipt = Receipt.fromJson(data);
+      Receipt receipt = Receipt.fromJson(data['receipt']);
       print('Receipt created successfully');
       return receipt;
     } else {
@@ -82,7 +82,7 @@ class APIReceipt extends APIRepository {
     }
   }
 
-  Future<MessageResponse?> updateInterest(
+  Future<MessageResponse?> UpdateInterest(
       int receiptId, bool isInterest) async {
     Uri uri =
         Uri.parse("$baseurl/Receipt/IsInterest").replace(queryParameters: {

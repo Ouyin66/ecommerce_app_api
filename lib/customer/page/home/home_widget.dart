@@ -12,7 +12,10 @@ import 'package:ecommerce_app_api/model/product.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../api/sharepre.dart';
+import '../../../model/user.dart';
 import '../shopping/detail_product_widget.dart';
+import 'package:flutter_avif/flutter_avif.dart';
 
 class HomeWidget extends StatefulWidget {
   const HomeWidget({super.key});
@@ -23,7 +26,7 @@ class HomeWidget extends StatefulWidget {
 
 class _HomeWidgetState extends State<HomeWidget> {
   final TextEditingController _searchingcontroller = TextEditingController();
-
+  User user = User();
   List<Product>? list = [];
   List<int> selectedCategoryIDs = [];
   List<Product> filteredProducts = [];
@@ -32,17 +35,23 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   String _query = '';
 
+  void getDataUser() async {
+    user = await getUser();
+    setState(() {});
+  }
+
   void getProduct() async {
     list = await APIProduct().GetList();
     listCategories = await APICategory().GetList();
     if (list != null) {
+      list = list!.where((p) => p.state != 0).toList();
       for (var pro in list!) {
-        pro.nameGender = await APIGender().getGender(pro.genderID!);
-        pro.nameCategory = await APICategory().getCategory(pro.genderID!);
-        pro.listPicture = await APIPicture().getPicturesByProduct(pro.id!);
-        pro.listVariant = await APIVariant().getVariantByProduct(pro.id!);
-        pro.listColor = await APIColor().getColorByProduct(pro.id!);
-        pro.listSize = await APISize().getSizeByProduct(pro.id!);
+        pro.nameGender = await APIGender().Get(pro.genderID!);
+        pro.nameCategory = await APICategory().Get(pro.genderID!);
+        pro.listPicture = await APIPicture().GetPicturesByProduct(pro.id!);
+        pro.listVariant = await APIVariant().GetVariantByProduct(pro.id!);
+        pro.listColor = await APIColor().GetColorByProduct(pro.id!);
+        pro.listSize = await APISize().GetSizeByProduct(pro.id!);
       }
       filteredProducts = List.from(list!);
     }
@@ -96,6 +105,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   @override
   void initState() {
     super.initState();
+    getDataUser();
     getProduct();
   }
 
@@ -138,7 +148,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => CartWidget()),
+                                builder: (context) => CartWidget(
+                                      user: user,
+                                    )),
                           );
                         },
                         icon: Icon(Icons.shopping_cart_rounded,
@@ -243,7 +255,14 @@ class _HomeWidgetState extends State<HomeWidget> {
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16)),
                 image: DecorationImage(
-                  image: NetworkImage(product.listPicture!.first.image!),
+                  image: product.listPicture!.isNotEmpty
+                      ? isAvifFile(product.listPicture!.first.image!) !=
+                              AvifFileType.unknown
+                          ? MemoryAvifImage(
+                              product.listPicture!.first.image!,
+                            )
+                          : MemoryImage(product.listPicture!.first.image!)
+                      : AssetImage(urlLogo),
                   fit: BoxFit.cover,
                   onError: (exception, stackTrace) => const Icon(Icons.image),
                 ),

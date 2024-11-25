@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:ecommerce_app_api/api/api.dart';
 
 class APIColor extends APIRepository {
-  Future<List<MyColor>?> getColorByProduct(int productId) async {
+  Future<List<MyColor>?> GetColorByProduct(int productId) async {
     try {
       Uri uri =
           Uri.parse("$baseurl/Color/ListByProductId").replace(queryParameters: {

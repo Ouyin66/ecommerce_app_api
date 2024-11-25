@@ -1,7 +1,10 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 class Picture {
   int? id;
   int? productId;
-  String? image;
+  Uint8List? image;
 
   Picture({
     this.id,
@@ -21,7 +24,9 @@ class Picture {
     return Picture(
       id: json["id"] ?? 0,
       productId: json["productId"] ?? 0,
-      image: json["image"] == null || json["image"] == '' ? "" : json["image"],
+      image: json["image"] != null
+          ? base64Decode(json["image"]) // Giải mã base64 thành Uint8List
+          : null,
     );
   }
 
@@ -29,7 +34,7 @@ class Picture {
     return {
       "id": id,
       "productId": productId,
-      "image": image,
+      "image": image != null ? base64Encode(image!) : null,
     };
   }
 }

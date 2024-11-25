@@ -28,7 +28,7 @@ class APICategory extends APIRepository {
     }
   }
 
-  Future<Category?> getCategory(int id) async {
+  Future<Category?> Get(int id) async {
     try {
       Uri uri = Uri.parse("$baseurl/Category/Get").replace(queryParameters: {
         'id': id.toString(),

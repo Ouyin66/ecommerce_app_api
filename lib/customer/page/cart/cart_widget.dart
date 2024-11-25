@@ -8,7 +8,6 @@ import 'package:ecommerce_app_api/model/variant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
 import '../../../model/cart.dart';
 import '../../../model/color.dart';
@@ -16,68 +15,70 @@ import '../../../model/selectedcart.dart';
 import '../../../model/size.dart';
 import '../../../model/user.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_avif/flutter_avif.dart';
 
 class CartWidget extends StatefulWidget {
-  const CartWidget({super.key});
+  final User user;
+  const CartWidget({super.key, required this.user});
 
   @override
   State<CartWidget> createState() => _CartWidgetState();
 }
 
 class _CartWidgetState extends State<CartWidget> {
-  User user = User.userEmpty();
+  User user = User();
   List<Cart>? list = [];
   Variant _selectedVariant = Variant.variantEmpty();
+  int? oldVariantId;
   int? colorId;
   int? sizeId;
   int? _quantity;
+
+  late Future<void>? _cartFuture;
 
   void getVariant(Cart cart) async {
     _selectedVariant.color =
         cart.product?.listColor?.firstWhere((c) => c.id == colorId);
 
-    _selectedVariant.size = cart.product?.listSize != []
-        ? null
-        : cart.product?.listSize?.firstWhere((s) => s.id == sizeId);
+    _selectedVariant.size =
+        cart.product?.listSize?.firstWhere((s) => s.id == sizeId);
 
-    if (sizeId != null) {
-      _selectedVariant = cart.product!.listVariant!.firstWhere(
-        (v) => v.colorID == colorId && v.sizeID == sizeId,
-        orElse: () => Variant.variantEmpty(),
-      );
-    } else {
-      _selectedVariant = cart.product!.listVariant!.firstWhere(
-        (v) => v.colorID == colorId,
-        orElse: () => Variant.variantEmpty(),
-      );
-    }
+    // if (sizeId != null) {
+    //   _selectedVariant = cart.product!.listVariant!.firstWhere(
+    //     (v) => v.colorID == colorId && v.sizeID == sizeId,
+    //     orElse: () => Variant.variantEmpty(),
+    //   );
+    // } else {
+    //   _selectedVariant = cart.product!.listVariant!.firstWhere(
+    //     (v) => v.colorID == colorId,
+    //     orElse: () => Variant.variantEmpty(),
+    //   );
+    // }
+
+    _selectedVariant = cart.product!.listVariant!.firstWhere(
+      (v) => v.colorID == colorId && v.sizeID == sizeId,
+      orElse: () => Variant.variantEmpty(),
+    );
 
     setState(() {});
   }
 
   Future<void> getList(int id) async {
-    list = await APICart().getCartByUser(id);
+    list = await APICart().GetCartByUser(id);
     if (list != null) {
       for (var cart in list!) {
-        cart.variant = await APIVariant().getVariant(cart.variantId!);
-        cart.product = await APIProduct().getProduct(cart.variant!.productID!);
+        cart.variant = await APIVariant().Get(cart.variantId!);
+        cart.product = await APIProduct().Get(cart.variant!.productID!);
         if (cart.product != null) {
           cart.product?.listColor =
-              await APIColor().getColorByProduct(cart.product!.id!);
+              await APIColor().GetColorByProduct(cart.product!.id!);
           cart.product?.listSize =
-              await APISize().getSizeByProduct(cart.product!.id!);
+              await APISize().GetSizeByProduct(cart.product!.id!);
           cart.product?.listVariant =
-              await APIVariant().getVariantByProduct(cart.product!.id!);
+              await APIVariant().GetVariantByProduct(cart.product!.id!);
         }
       }
     }
-    setState(() {});
-  }
-
-  void getDataUser() async {
-    user = await getUser();
-    print("Tìm thấy user");
-    getList(user.id!);
     setState(() {});
   }
 
@@ -90,8 +91,8 @@ class _CartWidgetState extends State<CartWidget> {
     var selectedCart = Provider.of<SelectedCart>(context, listen: false);
 
     if (cart.quantity! > 1 && cart.quantity! < cart.variant!.quantity!) {
-      var response = await APICart().updateCart(
-          cart.userId!, cart.variant!.id!, cart.quantity! - 1, cart.price!);
+      var response = await APICart().Update(cart.userId!, cart.variant!.id!,
+          cart.variant!.id!, cart.quantity! - 1, cart.price!);
       if (response?.successMessage != null) {
         await getList(user.id!);
         if (selectedCart.selected(response!.cart!)) {
@@ -109,9 +110,9 @@ class _CartWidgetState extends State<CartWidget> {
   void plus(Cart cart) async {
     var selectedCart = Provider.of<SelectedCart>(context, listen: false);
 
-    if (cart.quantity! < 3 && cart.quantity! < cart.variant!.quantity!) {
-      var response = await APICart().updateCart(
-          cart.userId!, cart.variant!.id!, cart.quantity! + 1, cart.price!);
+    if (cart.quantity! < cart.variant!.quantity!) {
+      var response = await APICart().Update(cart.userId!, cart.variant!.id!,
+          cart.variant!.id!, cart.quantity! + 1, cart.price!);
       if (response?.successMessage != null) {
         await getList(user.id!);
         if (selectedCart.selected(response!.cart!)) {
@@ -127,7 +128,8 @@ class _CartWidgetState extends State<CartWidget> {
   @override
   void initState() {
     super.initState();
-    getDataUser();
+    user = widget.user;
+    _cartFuture = getList(user.id!);
     Provider.of<SelectedCart>(context, listen: false).MakeNull();
   }
 
@@ -158,157 +160,168 @@ class _CartWidgetState extends State<CartWidget> {
           ),
         ),
       ),
-      body: SizedBox.expand(
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-              child: SingleChildScrollView(
-                child: Center(
-                  child: Column(
-                    children: [
-                      list == null || list!.isEmpty
-                          ? Center(
-                              child: Text(
-                                "Chưa có sản phẩm nào trong giỏ",
-                                style: labelGrey,
-                              ),
-                            )
-                          : ListView.builder(
-                              itemCount: list?.length,
-                              shrinkWrap: true,
-                              physics: const ScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                var item = list?[index];
-                                return _buildCart(item!, context);
-                              },
-                            ),
-                      SizedBox(
-                        height: 90,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 16,
-              left: 10,
-              right: 10,
-              child: Container(
-                width: double.maxFinite,
-                decoration: BoxDecoration(
-                  color: whiteColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(50),
-                      blurRadius: 20,
-                      spreadRadius: 10,
-                    ),
-                  ],
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                child: Padding(
-                  padding: const EdgeInsets.all(4),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(16),
-                            ),
-                            border: Border.all(
-                              color: blackColor,
-                              width: 2,
-                            ),
-                          ),
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              "${selectedCart.totalItem}",
-                              style: head,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Expanded(
-                        flex: 6,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          // mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Tổng tiền",
-                              style: GoogleFonts.barlow(
-                                  fontSize: 18,
-                                  color: blackColor,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            Text(
-                              NumberFormat('###,###.### đ')
-                                  .format(selectedCart.totalPrice),
-                              style: GoogleFonts.barlow(
-                                  fontSize: 18,
-                                  color: blackColor,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        flex: 4,
-                        child: FilledButton(
-                          onPressed: () {
-                            if (selectedCart.lst.isEmpty) {
-                              showToast(context, "Hãy chọn sản phẩm muốn đặt",
-                                  isError: true);
-                            } else {
-                              selectedCart.ClearAddress();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OrderWidget(
-                                    items: selectedCart.lst,
-                                    user: user,
+      body: FutureBuilder<void>(
+        future: _cartFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: LoadingScreen());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Lỗi khi tải dữ liệu"));
+          }
+          return SizedBox.expand(
+            child: Stack(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: Column(
+                        children: [
+                          list == null || list!.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    "Chưa có sản phẩm nào trong giỏ",
+                                    style: labelGrey,
                                   ),
+                                )
+                              : ListView.builder(
+                                  itemCount: list?.length,
+                                  shrinkWrap: true,
+                                  physics: const ScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    var item = list?[index];
+                                    return _buildCart(item!, context);
+                                  },
                                 ),
-                              );
-                            }
-                          },
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            backgroundColor: blackColor,
+                          SizedBox(
+                            height: 90,
                           ),
-                          child: Text(
-                            "Đặt hàng",
-                            style: subhead,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                  bottom: 16,
+                  left: 10,
+                  right: 10,
+                  child: Container(
+                    width: double.maxFinite,
+                    decoration: BoxDecoration(
+                      color: whiteColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(50),
+                          blurRadius: 20,
+                          spreadRadius: 10,
+                        ),
+                      ],
+                      borderRadius: BorderRadius.all(Radius.circular(16)),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(16),
+                                ),
+                                border: Border.all(
+                                  color: blackColor,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "${selectedCart.totalItem}",
+                                  style: head,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Expanded(
+                            flex: 6,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              // mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  "Tổng tiền",
+                                  style: GoogleFonts.barlow(
+                                      fontSize: 18,
+                                      color: blackColor,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Text(
+                                  NumberFormat('###,###.### đ')
+                                      .format(selectedCart.totalPrice),
+                                  style: GoogleFonts.barlow(
+                                      fontSize: 18,
+                                      color: blackColor,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: FilledButton(
+                              onPressed: () {
+                                if (selectedCart.lst.isEmpty) {
+                                  showToast(
+                                      context, "Hãy chọn sản phẩm muốn đặt",
+                                      isError: true);
+                                } else {
+                                  selectedCart.ClearAddress();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => OrderWidget(
+                                        items: selectedCart.lst,
+                                        user: user,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              style: FilledButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                backgroundColor: blackColor,
+                              ),
+                              child: Text(
+                                "Đặt hàng",
+                                style: subhead,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -362,8 +375,12 @@ class _CartWidgetState extends State<CartWidget> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(16)),
                               image: DecorationImage(
-                                image:
-                                    NetworkImage(item.variant?.picture ?? ''),
+                                image: isAvifFile(item.variant!.picture!) !=
+                                        AvifFileType.unknown
+                                    ? MemoryAvifImage(
+                                        item.variant!.picture!,
+                                      )
+                                    : MemoryImage(item.variant!.picture!),
                                 fit: BoxFit.cover,
                                 onError: (exception, stackTrace) => const Icon(
                                   Icons.broken_image,
@@ -470,91 +487,7 @@ class _CartWidgetState extends State<CartWidget> {
                             SizedBox(
                               height: 10,
                             ),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  height: 35,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(16)),
-                                  ),
-                                  child: IntrinsicHeight(
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        IconButton(
-                                          iconSize: 15,
-                                          onPressed: () {
-                                            setState(() {
-                                              minus(item);
-                                            });
-                                          },
-                                          icon: Icon(
-                                            Icons.remove_rounded,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 15,
-                                          child: VerticalDivider(
-                                            width: 1,
-                                          ),
-                                        ),
-                                        Container(
-                                          alignment: Alignment.center,
-                                          width: 40,
-                                          child: Text(
-                                            item.quantity.toString(),
-                                            style: GoogleFonts.barlow(
-                                              fontSize: 15,
-                                              color: blackColor,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 15,
-                                          child: VerticalDivider(
-                                            width: 1,
-                                          ),
-                                        ),
-                                        IconButton(
-                                          iconSize: 15,
-                                          onPressed: () {
-                                            setState(() {
-                                              plus(item);
-                                            });
-                                          },
-                                          icon: Icon(
-                                            Icons.add_rounded,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Spacer(),
-                                SizedBox(
-                                  height: 35,
-                                  child: IconButton(
-                                    onPressed: () {
-                                      showDeleteDialog(context, item);
-                                    },
-                                    icon: Icon(
-                                      Icons.delete_forever,
-                                      color: branchColor,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _buildQuantityCart(context, item),
                           ],
                         ),
                       ),
@@ -570,6 +503,91 @@ class _CartWidgetState extends State<CartWidget> {
         ],
       );
     });
+  }
+
+  Widget _buildQuantityCart(BuildContext context, Cart item) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          height: 35,
+          decoration: BoxDecoration(
+            border: Border.all(),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  iconSize: 15,
+                  onPressed: () {
+                    setState(() {
+                      minus(item);
+                    });
+                  },
+                  icon: Icon(
+                    Icons.remove_rounded,
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                  child: VerticalDivider(
+                    width: 1,
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.center,
+                  width: 40,
+                  child: Text(
+                    item.quantity.toString(),
+                    style: GoogleFonts.barlow(
+                      fontSize: 15,
+                      color: blackColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                  child: VerticalDivider(
+                    width: 1,
+                  ),
+                ),
+                IconButton(
+                  iconSize: 15,
+                  onPressed: () {
+                    setState(() {
+                      plus(item);
+                    });
+                  },
+                  icon: Icon(
+                    Icons.add_rounded,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Spacer(),
+        SizedBox(
+          height: 35,
+          child: IconButton(
+            onPressed: () {
+              showDeleteDialog(context, item);
+            },
+            icon: Icon(
+              Icons.delete_forever,
+              color: branchColor,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _buildColor(Cart cart, MyColor color, BuildContext context,
@@ -599,7 +617,11 @@ class _CartWidgetState extends State<CartWidget> {
                   )
                 : null,
             image: DecorationImage(
-              image: NetworkImage(color.image!),
+              image: isAvifFile(color.image!) != AvifFileType.unknown
+                  ? MemoryAvifImage(
+                      color.image!,
+                    )
+                  : MemoryImage(color.image!),
               fit: BoxFit.cover,
               onError: (exception, stackTrace) =>
                   const Icon(Icons.broken_image),
@@ -664,6 +686,7 @@ class _CartWidgetState extends State<CartWidget> {
       if (_selectedVariant.sizeID != null) {
         sizeId = _selectedVariant.sizeID;
       }
+      oldVariantId = cart.variantId;
     });
 
     var selectedCart = Provider.of<SelectedCart>(context, listen: false);
@@ -693,7 +716,12 @@ class _CartWidgetState extends State<CartWidget> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(16)),
                           image: DecorationImage(
-                            image: NetworkImage(_selectedVariant.picture!),
+                            image: isAvifFile(_selectedVariant.picture!) !=
+                                    AvifFileType.unknown
+                                ? MemoryAvifImage(
+                                    _selectedVariant.picture!,
+                                  )
+                                : MemoryImage(_selectedVariant.picture!),
                             fit: BoxFit.cover,
                             onError: (exception, stackTrace) => const Icon(
                               Icons.broken_image,
@@ -869,9 +897,8 @@ class _CartWidgetState extends State<CartWidget> {
                               IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    if (_quantity! < 3 &&
-                                        _quantity! <
-                                            _selectedVariant.quantity!) {
+                                    if (_quantity! <
+                                        _selectedVariant.quantity!) {
                                       _quantity = _quantity! + 1;
                                     }
                                   });
@@ -897,27 +924,16 @@ class _CartWidgetState extends State<CartWidget> {
                         onPressed: _selectedVariant.quantity! == 0
                             ? null
                             : () async {
-                                var response = await APICart().updateCart(
+                                var response = await APICart().Update(
                                     user.id!,
+                                    oldVariantId!,
                                     _selectedVariant.id!,
                                     _quantity!,
                                     _selectedVariant.price!);
+
                                 if (response?.successMessage != null) {
                                   print(response?.successMessage);
                                   reload();
-                                  var existing =
-                                      list?.firstWhere((c) => c.id == cart.id);
-                                  if (list!.contains(existing)) {
-                                    if (selectedCart.selected(cart)) {
-                                      selectedCart.Remove(cart);
-                                      selectedCart.Update(response!.cart!);
-                                    }
-                                  } else {
-                                    if (selectedCart
-                                        .selected(response!.cart!)) {
-                                      selectedCart.Update(response.cart!);
-                                    }
-                                  }
                                 } else {
                                   print(response?.errorMessage);
                                 }
@@ -985,7 +1001,8 @@ class _CartWidgetState extends State<CartWidget> {
                 ),
               ),
               onPressed: () async {
-                var response = await APICart().deleteCart(cart.id!);
+                var response =
+                    await APICart().Delete(cart.userId!, cart.variantId!);
                 if (response?.successMessage != null) {
                   if (selectedCart.selected(cart)) {
                     selectedCart.Remove(cart);

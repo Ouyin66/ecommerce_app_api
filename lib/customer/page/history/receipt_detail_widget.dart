@@ -8,6 +8,7 @@ import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
 import '../../../model/user.dart';
 import 'order_tracking_widget.dart';
+import 'package:flutter_avif/flutter_avif.dart';
 
 class ReceiptDetailWidget extends StatefulWidget {
   final Receipt receipt;
@@ -37,7 +38,7 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
 
   void getVariantReceipt() async {
     for (var variantReceipt in receipt.receiptVariants) {
-      var response = await APIVariant().getVariant(variantReceipt.variantId!);
+      var response = await APIVariant().Get(variantReceipt.variantId!);
       if (response != null) {
         variantReceipt.variant = response;
       } else {
@@ -416,7 +417,12 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
                       border: Border.all(color: greyColor.withOpacity(0.3)),
                       borderRadius: BorderRadius.all(Radius.circular(16)),
                       image: DecorationImage(
-                        image: NetworkImage(item.variant?.picture ?? ''),
+                        image: isAvifFile(item.variant!.picture!) !=
+                                AvifFileType.unknown
+                            ? MemoryAvifImage(
+                                item.variant!.picture!,
+                              )
+                            : MemoryImage(item.variant!.picture!),
                         fit: BoxFit.cover,
                         onError: (exception, stackTrace) => const Icon(
                           Icons.broken_image,

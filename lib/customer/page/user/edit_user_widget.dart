@@ -28,7 +28,7 @@ class _EditUserWidgetState extends State<EditUserWidget> {
   String? _selectedImage;
 
   void changeInformation() async {
-    var response = await APIUser().updateInformation(user);
+    var response = await APIUser().UpdateInformation(user);
     if (response?.user != null) {
       if (await saveUser(response!.user!)) {
         if (response.successMessage != null) {
@@ -51,7 +51,7 @@ class _EditUserWidgetState extends State<EditUserWidget> {
       user.image = _selectedImage;
     }
 
-    var response = await APIUser().updateInformation(user);
+    var response = await APIUser().UpdateInformation(user);
     if (response?.user != null) {
       if (await saveUser(response!.user!)) {
         if (response.successMessage != null) {

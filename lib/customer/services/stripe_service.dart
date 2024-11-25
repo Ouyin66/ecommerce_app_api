@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:ecommerce_app_api/api/api_receipt.dart';
 import 'package:ecommerce_app_api/model/receipt.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:ecommerce_app_api/config/const.dart';
-
+import 'package:http/http.dart' as http;
 import '../page/order/success_order_widget.dart';
 
 class StripeService {
@@ -55,29 +57,27 @@ class StripeService {
   Future<Map<String, dynamic>?> _createPaymentIntent(
       double amount, String currency) async {
     try {
-      final Dio dio = Dio();
-      Map<String, dynamic> data = {
+      Map<String, dynamic>? paymentInfo = {
         "amount": _calculateAmount(amount),
         "currency": currency,
+        // "payment_method_types[]": "card",
       };
 
-      var response = await dio.post(
-        "https://api.stripe.com/v1/payment_intents",
-        data: data,
-        options: Options(
-          contentType: Headers.formUrlEncodedContentType,
-          headers: {
-            "Authorization": "Bearer $stripeSecretKey",
-            "Content-Type": 'application/x-www-form-urlencoded',
-          },
-        ),
+      var response = await http.post(
+        Uri.parse("https://api.stripe.com/v1/payment_intents"),
+        body: paymentInfo,
+        headers: {
+          "Authorization": "Bearer $stripeSecretKey",
+          "Content-Type": 'application/x-www-form-urlencoded',
+        },
       );
 
-      if (response.data != null) {
+      if (response.body != null) {
         // Trả về cả client_secret và paymentIntent.id
         return {
-          'paymentIntentClientSecret': response.data["client_secret"],
-          'paymentIntentId': response.data["id"],
+          'paymentIntentClientSecret':
+              jsonDecode(response.body)["client_secret"],
+          'paymentIntentId': jsonDecode(response.body)["id"],
         };
       }
       return null;
@@ -107,7 +107,7 @@ class StripeService {
   }
 
   void _onPaymentSuccess(Receipt receipt, BuildContext context) async {
-    var response = await APIReceipt().createReceipt(receipt);
+    var response = await APIReceipt().Create(receipt);
     if (response != null) {
       print(response);
       Navigator.push(

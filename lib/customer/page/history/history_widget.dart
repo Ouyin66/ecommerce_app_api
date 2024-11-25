@@ -123,7 +123,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   }
 
   void isInterest(int receiptId, bool isInterest) async {
-    var response = await APIReceipt().updateInterest(receiptId, isInterest);
+    var response = await APIReceipt().UpdateInterest(receiptId, isInterest);
     if (response?.successMessage != null) {
       getListReceipt(user.id!);
     } else {

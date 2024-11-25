@@ -39,7 +39,7 @@ Future<User> getUser() async {
 
 Future<bool> updateUser(int userId) async {
   try {
-    var response = await APIUser().getUser(userId);
+    var response = await APIUser().Get(userId);
 
     if (response?.user != null) {
       if (await saveUser(response!.user!)) {

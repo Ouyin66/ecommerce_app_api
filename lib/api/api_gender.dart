@@ -4,7 +4,7 @@ import 'package:ecommerce_app_api/api/api.dart';
 import '../model/gender.dart';
 
 class APIGender extends APIRepository {
-  Future<Gender?> getGender(int id) async {
+  Future<Gender?> Get(int id) async {
     try {
       Uri uri = Uri.parse("$baseurl/Gender/Get").replace(queryParameters: {
         'id': id.toString(),

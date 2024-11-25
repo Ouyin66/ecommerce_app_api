@@ -17,7 +17,7 @@ class _ForgotPasswordWidgetState extends State<ForgotPasswordWidget> {
 
   void forgotPassword() async {
     try {
-      var response = await APIUser().forgotPassword(_emailController.text);
+      var response = await APIUser().ForgotPassword(_emailController.text);
 
       setState(() {
         errorMessage = null;

@@ -31,7 +31,7 @@ class _RegisterWidgetState extends State<RegisterWidget> {
 
   void register() async {
     try {
-      var response = await APIUser().register(
+      var response = await APIUser().Register(
           _nameController.text,
           _emailController.text,
           _phoneController.text,
@@ -40,7 +40,6 @@ class _RegisterWidgetState extends State<RegisterWidget> {
       // Kiểm tra phản hồi từ API
       setState(() {
         errorEmail = null;
-
         if (response?.user != null) {
           showToast(context, "Đăng ký thành công");
           Navigator.push(context,

@@ -56,7 +56,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
   }
 
   Future<Receipt?> getReceipt(int receiptId) async {
-    var response = await APIReceipt().GetReceipt(receiptId);
+    var response = await APIReceipt().Get(receiptId);
     if (response != null) {
       return response;
     }

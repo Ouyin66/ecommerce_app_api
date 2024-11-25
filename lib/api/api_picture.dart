@@ -4,7 +4,7 @@ import 'package:ecommerce_app_api/api/api.dart';
 import '../model/picture.dart';
 
 class APIPicture extends APIRepository {
-  Future<List<Picture>?> getPicturesByProduct(int productId) async {
+  Future<List<Picture>?> GetPicturesByProduct(int productId) async {
     try {
       Uri uri = Uri.parse("$baseurl/Picture/ListByProductId")
           .replace(queryParameters: {

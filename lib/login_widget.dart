@@ -32,7 +32,7 @@ class _LoginWidgetState extends State<LoginWidget> with RouteAware {
       autoLogin();
 
       var response = await APIUser()
-          .login(_emailController.text, _passwordController.text);
+          .Login(_emailController.text, _passwordController.text);
 
       // Kiểm tra phản hồi từ API
 
@@ -40,12 +40,16 @@ class _LoginWidgetState extends State<LoginWidget> with RouteAware {
       errorPassword = null;
 
       if (response?.user != null) {
-        if (await saveUser(response!.user!)) {
-          showToast(context, "Đăng nhập thành công");
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const MainPage()));
+        if (response?.user?.state == 1) {
+          if (await saveUser(response!.user!)) {
+            showToast(context, "Đăng nhập thành công");
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const MainPage()));
+          } else {
+            print("Không saveUser được");
+          }
         } else {
-          print("Không saveUser được");
+          showToast(context, "Tài khoản của bạn đã bị khóa", isError: true);
         }
       } else if (response?.errorMessageEmail != null) {
         errorEmail = response?.errorMessageEmail;
@@ -318,7 +322,7 @@ class _LoginWidgetState extends State<LoginWidget> with RouteAware {
             final googleUser = await GoogleSigninApi.login();
             print(googleUser);
             if (googleUser != null) {
-              var response = await APIUser().signInGoogle(googleUser.email,
+              var response = await APIUser().SignInGoogle(googleUser.email,
                   googleUser.id, googleUser.photoUrl, googleUser.displayName);
               if (await saveUser(response!.user!)) {
                 Navigator.push(context,
