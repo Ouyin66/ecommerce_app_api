@@ -33,6 +33,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   List<Product> searchingProducts = [];
   List<Category>? listCategories = [];
 
+  bool _isLoading = true;
   String _query = '';
 
   void getDataUser() async {
@@ -40,14 +41,14 @@ class _HomeWidgetState extends State<HomeWidget> {
     setState(() {});
   }
 
-  void getProduct() async {
+  Future<void> getProduct() async {
     list = await APIProduct().GetList();
     listCategories = await APICategory().GetList();
     if (list != null) {
       list = list!.where((p) => p.state != 0).toList();
       for (var pro in list!) {
         pro.nameGender = await APIGender().Get(pro.genderID!);
-        pro.nameCategory = await APICategory().Get(pro.genderID!);
+        pro.nameCategory = await APICategory().Get(pro.categoryID!);
         pro.listPicture = await APIPicture().GetPicturesByProduct(pro.id!);
         pro.listVariant = await APIVariant().GetVariantByProduct(pro.id!);
         pro.listColor = await APIColor().GetColorByProduct(pro.id!);
@@ -106,7 +107,19 @@ class _HomeWidgetState extends State<HomeWidget> {
   void initState() {
     super.initState();
     getDataUser();
-    getProduct();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await getProduct();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -116,107 +129,110 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: whiteColor,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
-        child: SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 13,
-                      child: _buildSearching(),
-                    ),
-                    Spacer(),
-                    Expanded(
-                      flex: 2,
-                      child: _myFilter(),
-                    ),
-                    Spacer(),
-                    Expanded(
-                      flex: 2,
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CartWidget(
-                                      user: user,
-                                    )),
-                          );
-                        },
-                        icon: Icon(Icons.shopping_cart_rounded,
-                            color: blackColor),
+    return _isLoading
+        ? LoadingScreen()
+        : Scaffold(
+            backgroundColor: whiteColor,
+            body: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
+              child: SingleChildScrollView(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                selectedCategoryIDs.isEmpty
-                    ? SizedBox()
-                    : SizedBox(
-                        height: 50,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: selectedCategoryIDs.length,
-                            shrinkWrap: true,
-                            physics: const ScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              var category = listCategories?.firstWhere(
-                                (c) => c.id == selectedCategoryIDs[index],
-                              );
-                              return _buildFilter(category, context);
-                            },
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 13,
+                            child: _buildSearching(),
                           ),
-                        ),
+                          Spacer(),
+                          Expanded(
+                            flex: 2,
+                            child: _myFilter(),
+                          ),
+                          Spacer(),
+                          Expanded(
+                            flex: 2,
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CartWidget(
+                                            user: user,
+                                          )),
+                                );
+                              },
+                              icon: Icon(Icons.shopping_cart_rounded,
+                                  color: blackColor),
+                            ),
+                          ),
+                        ],
                       ),
-                SizedBox(
-                  height: 5,
-                ),
-                // List
-                filteredProducts.isEmpty
-                    ? Text(
-                        "Không có sản phẩm nào",
-                        style: labelGrey,
-                      )
-                    : GridView.builder(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        itemCount: filteredProducts.length,
-                        shrinkWrap: true,
-                        physics: const ScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 0.6,
-                                crossAxisSpacing: 20,
-                                mainAxisSpacing: 12),
-                        itemBuilder: (context, index) {
-                          return _buildProduct(
-                              filteredProducts[index], context);
-                        },
+                      SizedBox(
+                        height: 10,
                       ),
-                SizedBox(
-                  height: 80,
+                      selectedCategoryIDs.isEmpty
+                          ? SizedBox()
+                          : SizedBox(
+                              height: 50,
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: ListView.builder(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: selectedCategoryIDs.length,
+                                  shrinkWrap: true,
+                                  physics: const ScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    var category = listCategories?.firstWhere(
+                                      (c) => c.id == selectedCategoryIDs[index],
+                                    );
+                                    return _buildFilter(category, context);
+                                  },
+                                ),
+                              ),
+                            ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      // List
+                      filteredProducts.isEmpty
+                          ? Text(
+                              "Không có sản phẩm nào",
+                              style: labelGrey,
+                            )
+                          : GridView.builder(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              itemCount: filteredProducts.length,
+                              shrinkWrap: true,
+                              physics: const ScrollPhysics(),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      childAspectRatio: 0.6,
+                                      crossAxisSpacing: 20,
+                                      mainAxisSpacing: 12),
+                              itemBuilder: (context, index) {
+                                return _buildProduct(
+                                    filteredProducts[index], context);
+                              },
+                            ),
+                      SizedBox(
+                        height: 80,
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 
   Widget _buildProduct(Product product, BuildContext context) {
@@ -302,14 +318,16 @@ class _HomeWidgetState extends State<HomeWidget> {
                           ? SizedBox()
                           : Text.rich(
                               TextSpan(
-                                text: "${product.listSize?.first.name}-",
+                                text: product.listSize?.first.name,
                                 style: GoogleFonts.barlow(
                                     fontSize: 15,
                                     color: greyColor,
                                     fontWeight: FontWeight.bold),
                                 children: <TextSpan>[
                                   TextSpan(
-                                    text: product.listSize?.last.name,
+                                    text: product.listSize?.first.name == 'Khác'
+                                        ? ""
+                                        : "-${product.listSize?.last.name}",
                                     style: GoogleFonts.barlow(
                                       fontSize: 15,
                                       color: greyColor,
@@ -327,9 +345,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                   Text(
                     product.name.toString(),
                     style: subhead,
-                    maxLines: 3,
+                    maxLines: 2,
                     softWrap: true,
-                    overflow: TextOverflow.clip,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(
                     height: 2,

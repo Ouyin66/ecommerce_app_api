@@ -1,10 +1,13 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 class User {
   int? id;
   String? email;
   String? password;
   String? name;
   String? phone;
-  String? image;
+  Uint8List? image;
   int? defaultLocationID;
   int? gender;
   int? state;
@@ -34,7 +37,7 @@ class User {
       password: '',
       name: '',
       phone: '',
-      image: '',
+      image: null,
       defaultLocationID: null,
       gender: null,
       state: null,
@@ -50,7 +53,9 @@ class User {
       email: json["email"] ?? '',
       password: json["password"] ?? '',
       name: json["name"] ?? '',
-      image: json["image"] == null || json["image"] == '' ? "" : json["image"],
+      image: json["image"] != null
+          ? base64Decode(json["image"]) // Giải mã base64 thành Uint8List
+          : null,
       phone: json["phone"] ?? '',
       defaultLocationID: json["defaultLocationId"] ?? 0,
       gender: json["gender"] ?? 0,
@@ -68,7 +73,7 @@ class User {
       "password": password, // Consider not storing the password in plain text
       "name": name,
       "phone": phone,
-      "image": image,
+      "image": image != null ? base64Encode(image!) : null,
       "defaultLocationId": defaultLocationID,
       "gender": gender,
       "state": state,

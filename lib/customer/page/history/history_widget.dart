@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
+import '../../../main.dart';
 import '../../../model/receipt.dart';
 import '../../../model/user.dart';
 
@@ -15,12 +16,15 @@ class HistoryWidget extends StatefulWidget {
   State<HistoryWidget> createState() => _HistoryWidgetState();
 }
 
-class _HistoryWidgetState extends State<HistoryWidget> {
+class _HistoryWidgetState extends State<HistoryWidget> with RouteAware {
   final TextEditingController _searchingcontroller = TextEditingController();
   User user = User(id: 0);
+
   List<Receipt> lst = [];
   List<Receipt> filteredReceipts = [];
   List<int> selectedStateList = [];
+
+  bool _isLoading = true;
   bool _isIncrease = false;
   DateTime? selectedDate;
   var _query = '';
@@ -28,11 +32,11 @@ class _HistoryWidgetState extends State<HistoryWidget> {
   final List<Map<String, dynamic>> lstState = [
     {'id': 0, 'label': 'Đã hủy', 'color': branchColor},
     {'id': 1, 'label': 'Đang xử lý', 'color': Colors.deepOrangeAccent},
-    {'id': 2, 'label': 'Đang giao', 'color': Colors.redAccent},
+    {'id': 2, 'label': 'Đang giao', 'color': Colors.pink},
     {'id': 3, 'label': 'Đã giao', 'color': Colors.green},
   ];
 
-  void getDataUser() async {
+  Future<void> getData() async {
     user = await getUser();
     print("Tìm thấy user");
     getListReceipt(user.id!);
@@ -133,10 +137,42 @@ class _HistoryWidgetState extends State<HistoryWidget> {
     setState(() {});
   }
 
+  Future<void> _initializeData() async {
+    setState(() {
+      _isLoading = true; // Bắt đầu tải
+    });
+
+    await getData();
+
+    setState(() {
+      _isLoading = false; // Tải xong
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    getDataUser();
+    _initializeData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute<dynamic>) {
+      MainApp.routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    MainApp.routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    _initializeData();
   }
 
   @override
@@ -281,7 +317,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                     Container(
                       padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
                       decoration: BoxDecoration(
-                        color: stateColor.withOpacity(0.4),
+                        color: stateColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
@@ -318,7 +354,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
                 ),
                 _buildInfo(
                   Icons.contact_phone_outlined,
-                  "${user.name} | ${item.phone}",
+                  "${item.name} | ${item.phone}",
                 ),
                 _buildInfo(
                   Icons.location_on_outlined,
@@ -379,15 +415,18 @@ class _HistoryWidgetState extends State<HistoryWidget> {
         SizedBox(
           width: 5,
         ),
-        Text(
-          information,
-          style: GoogleFonts.barlow(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
+        Expanded(
+          child: Text(
+            information,
+            style: GoogleFonts.barlow(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.left,
+            softWrap: true,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          textAlign: TextAlign.left,
-          softWrap: true,
-          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -594,7 +633,7 @@ class _HistoryWidgetState extends State<HistoryWidget> {
         Container(
           padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.3),
+            color: color.withOpacity(0.1),
             // border: Border.all(color: greyColor),
             borderRadius: BorderRadius.all(
               Radius.circular(24),

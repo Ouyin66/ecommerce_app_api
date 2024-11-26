@@ -4,8 +4,10 @@ import 'package:ecommerce_app_api/model/receipt_variant.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import '../../../api/api_status.dart';
 import '../../../api/sharepre.dart';
 import '../../../config/const.dart';
+import '../../../main.dart';
 import '../../../model/user.dart';
 import 'order_tracking_widget.dart';
 import 'package:flutter_avif/flutter_avif.dart';
@@ -18,14 +20,17 @@ class ReceiptDetailWidget extends StatefulWidget {
   State<ReceiptDetailWidget> createState() => _ReceiptDetailWidgetState();
 }
 
-class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
+class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget>
+    with RouteAware {
   Receipt receipt = Receipt(id: 0, receiptVariants: []);
   User user = User(id: 0);
+
+  bool _isLoading = true;
 
   final List<Map<String, dynamic>> lstState = [
     {'id': 0, 'label': 'Đã hủy', 'color': branchColor},
     {'id': 1, 'label': 'Đang xử lý', 'color': Colors.deepOrangeAccent},
-    {'id': 2, 'label': 'Đang giao', 'color': Colors.redAccent},
+    {'id': 2, 'label': 'Đang giao', 'color': Colors.pink},
     {'id': 3, 'label': 'Đã giao', 'color': Colors.green},
   ];
 
@@ -36,7 +41,7 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
     setState(() {});
   }
 
-  void getVariantReceipt() async {
+  Future<void> getVariantReceipt() async {
     for (var variantReceipt in receipt.receiptVariants) {
       var response = await APIVariant().Get(variantReceipt.variantId!);
       if (response != null) {
@@ -45,7 +50,6 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
         print("Không tìm thấy");
       }
     }
-
     setState(() {});
   }
 
@@ -54,7 +58,38 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
     super.initState();
     getDataUser();
     receipt = widget.receipt;
-    getVariantReceipt();
+    _initializeData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute<dynamic>) {
+      MainApp.routeObserver.subscribe(this, route);
+    }
+    _initializeData();
+  }
+
+  @override
+  void dispose() {
+    MainApp.routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {}
+
+  Future<void> _initializeData() async {
+    setState(() {
+      _isLoading = true; // Bắt đầu tải
+    });
+
+    await getVariantReceipt();
+
+    setState(() {
+      _isLoading = false; // Tải xong
+    });
   }
 
   @override
@@ -78,33 +113,35 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 50,
+            child: _isLoading
+                ? LoadingScreen()
+                : SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 50,
+                        ),
+                        _buildAppBar(),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        _buildBoxDetail(),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        _buildBoxInfoUser(),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        _buildBoxItem(),
+                        SizedBox(
+                          height: 20,
+                        ),
+                      ],
+                    ),
                   ),
-                  _buildAppBar(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _buildBoxDetail(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _buildBoxInfoUser(),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  _buildBoxItem(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
@@ -136,7 +173,7 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
         children: [
           _buildBoxTotal(),
           SizedBox(
-            height: 10,
+            height: 20,
           ),
           _buildInfo("Trạng thái", "", true),
           SizedBox(
@@ -161,6 +198,13 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
               ? _buildInfo("Giảm giá",
                   "- ${NumberFormat('###,###.### đ').format(receipt.discount)}")
               : SizedBox(),
+          SizedBox(
+            height: 10,
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: _buildButtonState(context),
+          ),
         ],
       ),
     );
@@ -175,7 +219,7 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          flex: 5,
+          flex: 4,
           child: Text(
             label,
             style: GoogleFonts.barlow(
@@ -223,13 +267,10 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
                       SizedBox(
                         width: 5,
                       ),
-                      InkWell(
-                        onTap: () {},
-                        child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: blackColor,
-                          size: 20,
-                        ),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: blackColor,
+                        size: 20,
                       ),
                     ],
                   ),
@@ -466,20 +507,20 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
                               item.variant?.color != null
                                   ? Text.rich(
                                       TextSpan(
-                                        text: "Phân loại: ",
+                                        text: item.variant?.color?.name ?? '',
                                         style: GoogleFonts.barlow(
                                             fontSize: 15,
                                             color: blackColor,
                                             fontWeight: FontWeight.bold),
                                         children: <TextSpan>[
-                                          TextSpan(
-                                            text:
-                                                item.variant?.color?.name ?? '',
-                                            style: GoogleFonts.barlow(
-                                                fontSize: 15,
-                                                color: blackColor,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                          // TextSpan(
+                                          //   text:
+                                          //       item.variant?.color?.name ?? '',
+                                          //   style: GoogleFonts.barlow(
+                                          //       fontSize: 15,
+                                          //       color: blackColor,
+                                          //       fontWeight: FontWeight.bold),
+                                          // ),
                                           item.variant?.size == null
                                               ? TextSpan()
                                               : TextSpan(
@@ -546,6 +587,90 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget> {
           height: 10,
         ),
       ],
+    );
+  }
+
+  Widget _buildButtonState(BuildContext context) {
+    var mainSate = receipt.orderStatusHistories!.first.state!;
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        overlayColor: branchColor,
+        foregroundColor: branchColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        side: BorderSide(
+            color: mainSate > 1 || mainSate == 0 ? greyColor : branchColor),
+      ),
+      onPressed: mainSate > 1 || mainSate == 0
+          ? null
+          : () {
+              showDeleteDialog(context);
+            },
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Text(
+          "Hủy đơn hàng",
+          style: subhead,
+        ),
+      ),
+    );
+  }
+
+  void showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: whiteColor,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(24)),
+          ),
+          title: Text(
+            "Bạn có chắc muốn hủy đơn hàng này?",
+            style: GoogleFonts.barlow(
+              fontSize: 24,
+              color: blackColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: [
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: blackColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                "Hủy",
+                style: subhead,
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: branchColor,
+                foregroundColor: whiteColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onPressed: () async {
+                var response = await APIStatus().Cancel(receipt.id!);
+                if (response?.status == null) {
+                  showToast(context, "Hủy đơn hàng thành công");
+                  Navigator.of(context).pop();
+                }
+                setState(() {});
+              },
+              child: Text("Xác nhận", style: subhead),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -33,19 +33,19 @@ class MainApp extends StatelessWidget {
       RouteObserver<PageRoute>();
   @override
   Widget build(BuildContext context) {
-    Receipt receipt = Receipt(
-      id: 2,
-      userId: 2,
-      name: "Nguyễn Phương Hồng Nhã",
-      address: "36 Đ. Trần Thị Trọng, Phường 15, Tân Bình, Hồ Chí Minh",
-      phone: "0916677676",
-      discount: 0,
-      total: 588000,
-      paymentId: "pi_3QOlG0D6t5ZfQvhu0UOx0ShC",
-      interest: false,
-      dateCreate: "2024-11-25T02:14:44.753",
-      receiptVariants: [],
-    );
+    // Receipt receipt = Receipt(
+    //   id: 2,
+    //   userId: 2,
+    //   name: "Nguyễn Phương Hồng Nhã",
+    //   address: "36 Đ. Trần Thị Trọng, Phường 15, Tân Bình, Hồ Chí Minh",
+    //   phone: "0916677676",
+    //   discount: 0,
+    //   total: 588000,
+    //   paymentId: "pi_3QOlG0D6t5ZfQvhu0UOx0ShC",
+    //   interest: false,
+    //   dateCreate: "2024-11-25T02:14:44.753",
+    //   receiptVariants: [],
+    // );
     return MaterialApp(
       // locale: Locale('vi'),
       supportedLocales: [
@@ -61,8 +61,8 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(
         dividerColor: blackColor,
       ),
-      // home: const LoginWidget(),
-      home: SuccessWidget(receipt: receipt),
+      home: const LoginWidget(),
+      // home: SuccessWidget(receipt: receipt),
       navigatorObservers: [routeObserver],
     );
   }

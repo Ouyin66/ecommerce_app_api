@@ -41,18 +41,6 @@ class _ProductDetailWidgetState extends State<ProductDetailWidget> {
         ? null
         : widget.product.listSize?.firstWhere((s) => s.id == sizeId);
 
-    // if (sizeId != null) {
-    //   _selectedVariant = widget.product.listVariant?.firstWhere(
-    //     (v) => v.colorID == colorId && v.sizeID == sizeId,
-    //     orElse: () => Variant.variantEmpty(),
-    //   );
-    // } else {
-    //   _selectedVariant = widget.product.listVariant?.firstWhere(
-    //     (v) => v.colorID == colorId,
-    //     orElse: () => Variant.variantEmpty(),
-    //   );
-    // }
-
     _selectedVariant = widget.product.listVariant!.firstWhere(
       (v) => v.colorID == colorId && v.sizeID == sizeId,
       orElse: () => Variant.variantEmpty(),

@@ -24,7 +24,9 @@ class _NotificationWidgetState extends State<NotificationWidget> {
   List<MyNotification> lstNew = [];
   List<MyNotification> lstOld = [];
 
-  void getDataUser() async {
+  bool _isLoading = true;
+
+  Future<void> getDataUser() async {
     user = await getUser();
     print("Tìm thấy user");
     getNotification(user.id!);
@@ -67,12 +69,24 @@ class _NotificationWidgetState extends State<NotificationWidget> {
   @override
   void initState() {
     super.initState();
-    getDataUser();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await getDataUser();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return lst.isEmpty
+    return _isLoading
         ? LoadingScreen()
         : Scaffold(
             backgroundColor: whiteColor,

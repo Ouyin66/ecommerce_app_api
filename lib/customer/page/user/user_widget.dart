@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:ecommerce_app_api/api/api.dart';
 import 'package:ecommerce_app_api/customer/page/user/change_password_widget.dart';
 import 'package:ecommerce_app_api/customer/page/user/location_widget.dart';
@@ -16,6 +17,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_avif/flutter_avif.dart';
 import 'edit_user_widget.dart';
 import 'rating_widget.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class UserWidget extends StatefulWidget {
   const UserWidget({super.key});
@@ -26,7 +28,7 @@ class UserWidget extends StatefulWidget {
 
 class _UserWidgetState extends State<UserWidget> with RouteAware {
   User? user = User.userEmpty();
-  String? _selectedImage;
+  Uint8List? _selectedImage;
 
   void logout() async {
     await deleteUser();
@@ -65,10 +67,8 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
         if (response.successMessage != null) {
           showToast(context, response.successMessage!);
         }
-        print(
-            "${response.user!.id}, ${response.user!.name}, ${response.user!.phone}, ${response.user!.gender}");
+        _selectedImage = null;
         getDataUser();
-        _selectedImage = '';
       } else {
         print("Không saveUser được");
       }
@@ -190,7 +190,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
   }
 
   Widget buildImage(double size) {
-    final String? imageUrl;
+    final imageUrl;
     if (user?.image == null || user?.image == '') {
       imageUrl = urlLogo;
     } else {
@@ -212,34 +212,55 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
                   errorBuilder: (context, error, stackTrace) =>
                       Icon(Icons.image_rounded),
                 )
-              : Image.network(
-                  imageUrl ?? '',
-                  width: size,
-                  height: size,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Center(child: CircularProgressIndicator());
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return ClipOval(
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Ink.image(
-                          image: FileImage(File(imageUrl!)),
-                          width: size,
-                          height: size,
-                          fit: BoxFit.cover,
-                          child: InkWell(
-                            onTap: () {
-                              _myShowBottomSheet(context);
-                            },
+              : isAvifFile(imageUrl) != AvifFileType.unknown
+                  ? AvifImage.memory(
+                      imageUrl ?? '',
+                      width: size,
+                      height: size,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return ClipOval(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Ink.image(
+                              image: FileImage(File(imageUrl!)),
+                              width: size,
+                              height: size,
+                              fit: BoxFit.cover,
+                              child: InkWell(
+                                onTap: () {
+                                  _myShowBottomSheet(context);
+                                },
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                        );
+                      },
+                    )
+                  : Image.memory(
+                      imageUrl ?? '',
+                      width: size,
+                      height: size,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return ClipOval(
+                          child: Material(
+                            color: Colors.transparent,
+                            child: Ink.image(
+                              image: FileImage(File(imageUrl!)),
+                              width: size,
+                              height: size,
+                              fit: BoxFit.cover,
+                              child: InkWell(
+                                onTap: () {
+                                  _myShowBottomSheet(context);
+                                },
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
         ),
       ),
     );
@@ -516,7 +537,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
                 children: [
                   TextButton(
                     onPressed: () {
-                      _pickImageFromGallery();
+                      _pickImageFromGallery(context);
                     },
                     child: Text(
                       "Chọn ảnh từ thư viện",
@@ -526,7 +547,7 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
                   Divider(),
                   TextButton(
                     onPressed: () {
-                      _pickImageFromCamera();
+                      _pickImageFromCamera(context);
                     },
                     child: Text(
                       "Chụp ảnh",
@@ -543,27 +564,105 @@ class _UserWidgetState extends State<UserWidget> with RouteAware {
   }
 
   // IMAGE
-  Future _pickImageFromGallery() async {
-    final returnedImage =
+  Future<void> _pickImageFromGallery(BuildContext context) async {
+    final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if (returnedImage == null) return;
-    setState(() {
-      _selectedImage = returnedImage.path;
-    });
-    updatePicture();
-    print(_selectedImage);
+    if (pickedFile != null) {
+      final Uint8List fileBytes = await pickedFile.readAsBytes();
+      if (fileBytes.length > 5610) {
+        final compressedImage = await FlutterImageCompress.compressWithList(
+          fileBytes,
+          quality: 15,
+          minWidth: 300,
+          minHeight: 300,
+        );
+
+        if (compressedImage.length > 5610) {
+          _showErrorDialog(context, compressedImage.length);
+        } else {
+          setState(() {
+            _selectedImage = compressedImage;
+          });
+          updatePicture();
+          print('Ảnh đã chọn, kích thước: ${compressedImage.length} bytes');
+        }
+      } else {
+        setState(() {
+          _selectedImage = fileBytes;
+        });
+        updatePicture();
+        print('Ảnh đã chọn, kích thước: ${fileBytes.length} bytes');
+      }
+    }
   }
 
-  Future _pickImageFromCamera() async {
-    final returnedImage =
+  Future<void> _pickImageFromCamera(BuildContext context) async {
+    final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.camera);
 
-    if (returnedImage == null) return;
-    setState(() {
-      _selectedImage = returnedImage.path;
-    });
-    updatePicture();
-    print(_selectedImage);
+    if (pickedFile != null) {
+      final Uint8List fileBytes = await pickedFile.readAsBytes();
+      if (fileBytes.length > 5610) {
+        final compressedImage = await FlutterImageCompress.compressWithList(
+          fileBytes,
+          quality: 30,
+          minWidth: 500,
+          minHeight: 500,
+        );
+
+        if (compressedImage.length > 5610) {
+          _showErrorDialog(context, compressedImage.length);
+        } else {
+          setState(() {
+            _selectedImage = compressedImage;
+          });
+          updatePicture();
+          print('Ảnh đã chọn, kích thước: ${compressedImage.length} bytes');
+        }
+      } else {
+        setState(() {
+          _selectedImage = fileBytes;
+        });
+        updatePicture();
+        print('Ảnh đã chọn, kích thước: ${fileBytes.length} bytes');
+      }
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, int fileSize) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: whiteColor,
+          title: Text(
+            'Kích thước file quá lớn',
+            style: GoogleFonts.barlow(
+              fontSize: 18,
+              color: blackColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            'File đã chọn có kích thước: ${fileSize} bytes.\nVui lòng chọn file nhỏ hơn 5.5KB.',
+            style: GoogleFonts.barlow(
+              fontSize: 18,
+              color: blackColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'OK',
+                style: subhead,
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

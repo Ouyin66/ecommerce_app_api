@@ -19,7 +19,7 @@ class OrderStatusHistory {
       receiptId: json["receiptId"] ?? 0,
       state: json["state"] ?? 0,
       notes: json["notes"] ?? '',
-      timestamp: json["timestamp"] ?? '',
+      timestamp: json["timeStamp"] ?? '',
     );
   }
 

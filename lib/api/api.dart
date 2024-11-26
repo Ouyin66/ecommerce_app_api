@@ -143,7 +143,7 @@ class APIUser extends APIRepository {
         'id': user.id.toString(),
         'name': user.name.toString(),
         'phone': user.phone.toString(),
-        'image': user.image.toString(),
+        'image': base64Encode(user.image!),
         'gender': user.gender.toString(),
       });
 
