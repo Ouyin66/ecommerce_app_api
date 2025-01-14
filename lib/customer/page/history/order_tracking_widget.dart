@@ -334,7 +334,7 @@ class _OrderTrackingWidgetState extends State<OrderTrackingWidget> {
 
   Widget _buildBoxItem() {
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -364,11 +364,18 @@ class _OrderTrackingWidgetState extends State<OrderTrackingWidget> {
           ),
           // Nút mở rộng/thu gọn danh sách
           if (receipt.receiptVariants.length > 1) ...[
-            const SizedBox(height: 10),
+            // const SizedBox(height: 5),
             IconButton(
-              icon: Icon(isExpanded
-                  ? Icons.keyboard_arrow_up
-                  : Icons.keyboard_arrow_down),
+              color: blackColor,
+              icon: Icon(
+                isExpanded
+                    ? Icons.keyboard_arrow_up
+                    : Icons.keyboard_arrow_down,
+                size: 30,
+              ),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.transparent,
+              ),
               onPressed: () {
                 setState(() {
                   isExpanded = !isExpanded;
@@ -516,11 +523,12 @@ class _OrderTrackingWidgetState extends State<OrderTrackingWidget> {
             ),
           ],
         ),
-        receipt.receiptVariants.last.receiptId == item.receiptId
-            ? SizedBox()
-            : SizedBox(
-                height: 10,
-              ),
+        SizedBox(
+          height: receipt.receiptVariants.last.receiptId != item.receiptId ||
+                  isExpanded == false
+              ? 0
+              : 10,
+        ),
       ],
     );
   }

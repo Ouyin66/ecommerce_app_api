@@ -43,18 +43,6 @@ class _CartWidgetState extends State<CartWidget> {
     _selectedVariant.size =
         cart.product?.listSize?.firstWhere((s) => s.id == sizeId);
 
-    // if (sizeId != null) {
-    //   _selectedVariant = cart.product!.listVariant!.firstWhere(
-    //     (v) => v.colorID == colorId && v.sizeID == sizeId,
-    //     orElse: () => Variant.variantEmpty(),
-    //   );
-    // } else {
-    //   _selectedVariant = cart.product!.listVariant!.firstWhere(
-    //     (v) => v.colorID == colorId,
-    //     orElse: () => Variant.variantEmpty(),
-    //   );
-    // }
-
     _selectedVariant = cart.product!.listVariant!.firstWhere(
       (v) => v.colorID == colorId && v.sizeID == sizeId,
       orElse: () => Variant.variantEmpty(),

@@ -575,17 +575,19 @@ class _ReceiptDetailWidgetState extends State<ReceiptDetailWidget>
             ),
           ],
         ),
-        SizedBox(
-          height: 10,
-        ),
-        Divider(
-          indent: 50,
-          endIndent: 50,
-          color: greyColor.withOpacity(0.5),
-        ),
-        SizedBox(
-          height: 10,
-        ),
+        if (receipt.receiptVariants.last.variantId != item.variantId) ...[
+          SizedBox(
+            height: 10,
+          ),
+          Divider(
+            indent: 50,
+            endIndent: 50,
+            color: greyColor.withOpacity(0.5),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+        ]
       ],
     );
   }

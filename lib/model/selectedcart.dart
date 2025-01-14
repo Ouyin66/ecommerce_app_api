@@ -32,7 +32,8 @@ class SelectedCart extends ChangeNotifier {
   }
 
   bool selected(Cart cart) {
-    return lst.any((c) => c.id == cart.id);
+    return lst
+        .any((c) => c.variantId == cart.variantId && c.userId == cart.userId);
   }
 
   void Add(Cart cart) {
@@ -45,19 +46,22 @@ class SelectedCart extends ChangeNotifier {
 
   void Remove(Cart cart) {
     if (selected(cart)) {
-      lst.removeWhere((c) => c.id == cart.id);
+      lst.removeWhere(
+          (c) => c.variantId == cart.variantId && c.userId == cart.userId);
     }
 
     notifyListeners();
   }
 
   void Update(Cart cart) {
-    var index = lst.indexWhere((c) => c.id == cart.id);
+    var index = lst.indexWhere(
+        (c) => c.variantId == cart.variantId && c.userId == cart.userId);
     if (index != -1) {
       lst[index].quantity = cart.quantity;
       notifyListeners();
     } else {
-      print("Không tìm thấy sản phẩm với id: ${cart.id}");
+      print(
+          "Không tìm thấy sản phẩm với id: ${cart.variantId} & ${cart.userId}");
     }
 
     notifyListeners();

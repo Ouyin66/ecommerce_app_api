@@ -62,7 +62,6 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     if (response != null) {
       return response;
     }
-
     return null;
   }
 
@@ -186,7 +185,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
         }
 
         if (item.type == 'Receipt') {
-          var obj = await getReceipt(item.id!);
+          var obj = await getReceipt(item.referenceId!);
           if (obj != null) {
             Navigator.push(
               context,

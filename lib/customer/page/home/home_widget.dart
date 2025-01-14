@@ -123,11 +123,6 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return _isLoading
         ? LoadingScreen()
